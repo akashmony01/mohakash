@@ -1,0 +1,35 @@
+---
+// Animated wordmark. Plays one cycle (Mohammed Akash → moh·akash → back),
+// then rests on the full name. trigger="load" fires on page load (header);
+// trigger="view" fires when scrolled into view (footer), driven by the
+// IntersectionObserver in BaseLayout that watches `.brand-onview`.
+interface Props {
+  class?: string;
+  trigger?: 'load' | 'view';
+}
+const { class: className = '', trigger = 'load' } = Astro.props;
+---
+
+<a
+  href="/"
+  aria-label="Mohammed Akash — moh·akash, the infinite sky"
+  class:list={[
+    'brand-logo inline-flex items-center',
+    trigger === 'load' ? 'brand-play' : 'brand-onview',
+    className,
+  ]}
+>
+  <span class="brand-reel" aria-hidden="true">
+    <span class="brand-track">
+      <span class="brand-panel">
+        <span class="flex flex-col font-display font-semibold uppercase leading-[0.9]">
+          <span class="text-[0.7rem] tracking-[0.05em]">Mohammed</span>
+          <span class="text-[1.3rem] tracking-[0.01em]">Akash</span>
+        </span>
+      </span>
+      <span class="brand-panel">
+        <span class="font-display text-[1.25rem] font-semibold tracking-tight">moh·akash</span>
+      </span>
+    </span>
+  </span>
+</a>

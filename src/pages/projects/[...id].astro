@@ -1,0 +1,32 @@
+---
+import { getCollection, render } from 'astro:content';
+import ProseLayout from '../../layouts/ProseLayout.astro';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  return projects.map((entry) => ({ params: { id: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const { title, summary, stack, year, link, repo, cover, resources } = entry.data;
+---
+
+<ProseLayout
+  title={title}
+  description={summary}
+  eyebrow={year ? `Project · ${year}` : 'Project'}
+  cover={cover}
+  resources={resources}
+  backHref="/projects"
+  backLabel="All projects"
+>
+  {(link || repo || stack.length > 0) && (
+    <div class="not-prose mb-8 flex flex-wrap items-center gap-3 text-sm">
+      {link && <a href={link} target="_blank" rel="noopener noreferrer" class="btn btn-solid rounded-lg px-3.5 py-1.5 font-medium">Live ↗</a>}
+      {repo && <a href={repo} target="_blank" rel="noopener noreferrer" class="btn btn-outline rounded-lg px-3.5 py-1.5 font-medium">Code ↗</a>}
+      {stack.map((s) => <span class="rounded-full border border-border px-2.5 py-0.5 text-xs text-muted">{s}</span>)}
+    </div>
+  )}
+  <Content />
+</ProseLayout>

@@ -1,0 +1,36 @@
+---
+import { getCollection, render } from 'astro:content';
+import ProseLayout from '../../layouts/ProseLayout.astro';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('research');
+  return entries.map((entry) => ({ params: { id: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const { title, date, type, abstract, pdf, link, cover, resources } = entry.data;
+const dateStr = date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+---
+
+<ProseLayout
+  title={title}
+  description={abstract ?? `Research ${type} by Mohammed Akash.`}
+  eyebrow={type}
+  meta={dateStr}
+  cover={cover}
+  resources={resources}
+  backHref="/research"
+  backLabel="All research"
+>
+  {abstract && (
+    <p class="not-prose mb-8 border-l-2 border-spark pl-4 text-muted italic">{abstract}</p>
+  )}
+  {(pdf || link) && (
+    <div class="not-prose mb-8 flex flex-wrap gap-3 text-sm">
+      {pdf && <a href={pdf} target="_blank" rel="noopener noreferrer" class="btn btn-solid rounded-lg px-3.5 py-1.5 font-medium">PDF ↗</a>}
+      {link && <a href={link} target="_blank" rel="noopener noreferrer" class="btn btn-outline rounded-lg px-3.5 py-1.5 font-medium">Source ↗</a>}
+    </div>
+  )}
+  <Content />
+</ProseLayout>

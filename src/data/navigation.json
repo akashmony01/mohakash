@@ -1,0 +1,16 @@
+{
+  "header": [
+    { "label": "About", "href": "/#about" },
+    { "label": "Projects", "href": "/projects" },
+    { "label": "Poetry", "href": "/poetry" },
+    { "label": "Research", "href": "/research" },
+    { "label": "Blog", "href": "/blog" }
+  ],
+  "footer": [
+    { "label": "Projects", "href": "/projects" },
+    { "label": "Poetry", "href": "/poetry" },
+    { "label": "Research", "href": "/research" },
+    { "label": "Blog", "href": "/blog" },
+    { "label": "About", "href": "/#about" }
+  ]
+}

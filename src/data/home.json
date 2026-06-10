@@ -1,0 +1,44 @@
+{
+  "hero": {
+    "eyebrow": "Hi there, myself",
+    "name": "Mohammed Akash",
+    "tagline": "moh·akash — “the infinite sky”",
+    "intro": "A web developer, researcher, and poet — lately building in public with Claude and sharing the journey, day by day.",
+    "ctaLabel": "Get in touch ↓"
+  },
+  "newsletter": {
+    "badge": "Newsletter",
+    "heading": "Get AI insights, code experiments & creative writing",
+    "subtext": "Weekly updates on tools, productivity, and building with Claude."
+  },
+  "about": {
+    "eyebrow": "About",
+    "heading": "A little about me",
+    "paragraphs": [
+      "I'm Mohammed Akash — moh·akash, “the infinite sky.” I started out building websites for clients, and over time my curiosity pulled me toward research and writing as much as code.",
+      "Now I'm focused on building in public with Claude — sharing what I learn, where I get things wrong, and the small wins along the way. Between projects I study what fascinates me and write poetry to keep the other half of my brain awake."
+    ],
+    "facts": [
+      {
+        "label": "Background",
+        "value": "Freelance web developer, now writing & building in public."
+      },
+      {
+        "label": "Education",
+        "value": "Computer science, with a long detour through the humanities."
+      },
+      {
+        "label": "These days",
+        "value": "Documenting what it’s like to build with Claude — day by day."
+      },
+      {
+        "label": "The goal",
+        "value": "To become a clear, trusted voice on building with AI."
+      }
+    ]
+  },
+  "featured": {
+    "heading": "Recent work",
+    "tagline": "Lately shipping"
+  }
+}

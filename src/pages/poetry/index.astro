@@ -1,0 +1,61 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SectionHero from '../../components/SectionHero.astro';
+import pages from '../../data/pages.json';
+
+const poems = (await getCollection('poetry')).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+const fmt = (d: Date) => d.getFullYear();
+
+// First few lines of a poem, to hint at its vibe on the card.
+function preview(body = ''): string[] {
+  return body.trim().split('\n').map((l) => l.trim()).filter(Boolean).slice(0, 3);
+}
+---
+
+<BaseLayout
+  title="Poetry — Mohammed Akash"
+  description="Poems by Mohammed Akash — verses and fragments written under the sky."
+>
+  <section class="mx-auto max-w-6xl px-5 py-14">
+    <SectionHero
+      title={pages.poetry.title}
+      intro={pages.poetry.intro}
+      tint="#1a8fd6"
+      motif="poetry"
+    />
+
+    {poems.length === 0 ? (
+      <p class="text-muted">Poems landing here soon.</p>
+    ) : (
+      <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {poems.map((p) => (
+          <a
+            href={`/poetry/${p.id}`}
+            class="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-surface p-6 card-cosmic"
+          >
+            <!-- subtle abstract corner -->
+            <svg class="pointer-events-none absolute -right-6 -top-6 h-24 w-24 text-accent/10 transition-colors group-hover:text-accent/20" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+              <circle cx="50" cy="50" r="40" stroke="currentColor" stroke-width="0.8" />
+              <circle cx="50" cy="50" r="26" stroke="currentColor" stroke-width="0.8" />
+              <g fill="currentColor"><circle cx="50" cy="10" r="1.8" /><circle cx="90" cy="50" r="1.4" /></g>
+            </svg>
+
+            <div class="relative flex items-baseline justify-between gap-3">
+              <h2 class="font-display text-xl text-text transition-colors group-hover:text-accent">{p.data.title}</h2>
+              <span class="shrink-0 text-sm text-muted">{fmt(p.data.date)}</span>
+            </div>
+
+            <p class="relative mt-4 flex-1 whitespace-pre-line font-display text-sm italic leading-relaxed text-muted">
+              {preview(p.body).join('\n')}
+            </p>
+
+            <span class="relative mt-5 text-sm text-accent transition-transform duration-200 group-hover:translate-x-1">Read →</span>
+          </a>
+        ))}
+      </div>
+    )}
+  </section>
+</BaseLayout>

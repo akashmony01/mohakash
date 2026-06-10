@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450" role="img" aria-label="A simple orbital diagram">
+  <rect width="800" height="450" fill="#f7f7f3"/>
+  <g stroke="#1a8fd6" stroke-opacity="0.5" fill="none" stroke-width="1.2">
+    <ellipse cx="400" cy="225" rx="320" ry="120"/>
+    <ellipse cx="400" cy="225" rx="220" ry="220"/>
+    <ellipse cx="400" cy="225" rx="120" ry="300"/>
+  </g>
+  <circle cx="400" cy="225" r="14" fill="#1a8fd6"/>
+  <circle cx="720" cy="225" r="7" fill="#c2912f" opacity="0"/>
+  <g fill="#1f6fb0">
+    <circle cx="720" cy="225" r="7"/>
+    <circle cx="400" cy="45" r="6"/>
+    <circle cx="180" cy="340" r="6"/>
+  </g>
+  <g fill="#14171d" font-family="Georgia, serif" font-size="18">
+    <text x="400" y="420" text-anchor="middle">a little system, drawn by hand</text>
+  </g>
+</svg>

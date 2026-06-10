@@ -1,0 +1,49 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  const poems = await getCollection('poetry');
+  return poems.map((entry) => ({ params: { id: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { title, date, note } = entry.data;
+// Render the poem's exact lines — Markdown would collapse single line breaks.
+const body = entry.body?.trim() ?? '';
+const dateStr = date.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
+---
+
+<BaseLayout title={`${title} — Mohammed Akash`} description={`A poem by Mohammed Akash. ${note ?? ''}`.trim()}>
+  <article class="relative mx-auto max-w-2xl overflow-visible px-5 py-16 text-center">
+    <!-- abstract reading-room sky -->
+    <div class="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
+      <div class="absolute left-1/2 top-10 h-72 w-72 -translate-x-1/2 rounded-full bg-accent/10 blur-3xl"></div>
+      <svg class="absolute -left-24 top-24 h-72 w-72 text-accent/15" viewBox="0 0 200 200" fill="none">
+        <ellipse cx="100" cy="100" rx="92" ry="40" stroke="currentColor" stroke-width="0.7" transform="rotate(20 100 100)" />
+        <ellipse cx="100" cy="100" rx="64" ry="64" stroke="currentColor" stroke-width="0.7" />
+        <circle cx="8" cy="120" r="2.4" fill="currentColor" />
+      </svg>
+      <svg class="absolute -right-24 bottom-24 h-72 w-72 text-accent/15" viewBox="0 0 200 200" fill="none">
+        <ellipse cx="100" cy="100" rx="92" ry="40" stroke="currentColor" stroke-width="0.7" transform="rotate(-25 100 100)" />
+        <circle cx="192" cy="80" r="2" fill="currentColor" />
+      </svg>
+      <svg class="absolute left-1/2 top-2 h-12 w-12 -translate-x-1/2 text-accent/40" viewBox="0 0 32 32" fill="currentColor">
+        <path d="M16 4 L17.8 14.2 L28 16 L17.8 17.8 L16 28 L14.2 17.8 L4 16 L14.2 14.2 Z" />
+      </svg>
+    </div>
+
+    <a href="/poetry" class="relative mb-12 inline-block text-sm text-muted hover:text-accent transition-colors">← All poems</a>
+
+    <h1 class="relative font-display text-3xl text-text sm:text-4xl">{title}</h1>
+
+    <div class="relative mx-auto mt-12 max-w-prose whitespace-pre-line font-display text-lg leading-loose text-text/90">
+      {body}
+    </div>
+
+    <footer class="relative mt-14 text-sm text-muted">
+      {note && <p class="mb-2 italic">{note}</p>}
+      <p>{dateStr}</p>
+    </footer>
+  </article>
+</BaseLayout>

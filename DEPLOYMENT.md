@@ -1,0 +1,242 @@
+# Deployment & Hosting Plan — mohakash.xyz
+
+The ordered, do-it-once plan to take the site from "works on my laptop" to
+"live on mohakash.xyz with a CMS, contact form, and newsletter." Work through
+the **Parts in order** — each part depends on the ones before it. Tick the
+boxes as we finish.
+
+## The final stack
+
+| Layer | Tool | Cost |
+|---|---|---|
+| Source of truth | **GitHub** repo | Free |
+| Hosting + build | **Cloudflare Pages** (auto-deploys on git push) | Free |
+| CMS (edit anywhere) | **Keystatic** GitHub mode → commits back to the repo | Free |
+| Contact form | **Cloudflare Pages Function** + **Resend** + **Turnstile** | Free |
+| Newsletter | **Kit** (ConvertKit) free plan — up to 10k subscribers | Free |
+| DNS + domain | **Cloudflare DNS** | Free |
+
+**Flow once live:** edit at `mohakash.xyz/keystatic` → Keystatic commits to GitHub
+→ Cloudflare Pages rebuilds → site updates (~1 min). Local `git push` works the
+same way. GitHub is always the hub.
+
+---
+
+## Accounts we'll need (gather these first)
+
+- [ ] **GitHub** account (+ ability to create a repo)
+- [ ] **Cloudflare** account (free)
+- [ ] **Resend** account (free) — for contact-form email delivery
+- [ ] **Kit** account (free) — for the newsletter
+- [ ] **Namecheap** (or wherever `mohakash.xyz` is registered) login — to point nameservers at Cloudflare
+
+> When a step needs you to log in / click in a dashboard, I'll tell you exactly
+> what to do and you run it; I handle all the code/config changes.
+
+---
+
+## Part 0 — Local pre-flight (no accounts yet)
+
+**Goal:** make sure the project is clean and builds before we ship it anywhere.
+
+- [x] Confirm a clean static build: `npm run build` → **16 pages, no errors** ✓ (2026-06-10)
+- [x] Confirm `.gitignore` covers `node_modules/`, `dist/`, `.astro/`, `.env*` ✓
+- [x] Note placeholder assets to replace later (now itemized precisely in **Part 7**) ✓
+- [x] Portrait check: `/uploads/portraitLight.png` + `/uploads/portraitDark.png` both exist and are wired in `general.json` — **not** a placeholder ✓
+- [x] Repo name + visibility decided: **`mohakash`, public** ✓ (2026-06-10)
+
+**Done when:** `npm run build` is green locally. ✅ **PART 0 COMPLETE.**
+
+---
+
+## Part 1 — Get the project into GitHub
+
+**Goal:** repo exists on GitHub; it's the source of truth everything else hangs off.
+**Depends on:** Part 0.
+
+- [ ] `git init` in `/home/mhmd1/Documents/mohakash`
+- [ ] First commit (everything except the gitignored stuff)
+- [ ] Create the GitHub repo (via `gh` CLI or the website)
+- [ ] Add remote + `git push -u origin main`
+- [ ] Verify the code shows up on GitHub (and `node_modules`/`dist` do **not**)
+
+**Done when:** the repo is on GitHub with a clean file list.
+
+---
+
+## Part 2 — First Cloudflare Pages deploy (plain static)
+
+**Goal:** the site is live on a `*.pages.dev` URL — baseline deploy before we add CMS/forms.
+**Depends on:** Part 1.
+
+- [ ] In Cloudflare dashboard → **Workers & Pages → Create → Pages → Connect to Git**
+- [ ] Pick the GitHub repo, authorize Cloudflare to read it
+- [ ] Build settings: **Framework = Astro**, build command `npm run build`, output dir `dist`
+- [ ] Deploy → get the `https://<project>.pages.dev` URL
+- [ ] Open it, click around (themes, nav, all 4 sections) — confirm it works
+
+**Done when:** the site loads correctly on the `.pages.dev` URL, and pushing to
+`main` triggers an automatic redeploy.
+
+> At this point Keystatic is still dev-only and the forms still say "not
+> connected yet" — that's expected. We're confirming hosting works first.
+
+---
+
+## Part 3 — Custom domain + DNS on Cloudflare
+
+**Goal:** site live on `mohakash.xyz` with HTTPS. Needed before Keystatic GitHub
+login and Resend (callback URLs / email domain use the real domain).
+**Depends on:** Part 2.
+
+- [ ] In Cloudflare → **Add a site** → `mohakash.xyz` (free plan) → Cloudflare gives you 2 nameservers
+- [ ] In Namecheap → set the domain's nameservers to Cloudflare's two → wait for propagation (minutes–hours)
+- [ ] In the Pages project → **Custom domains** → add `mohakash.xyz` and `www.mohakash.xyz`
+- [ ] Confirm Cloudflare auto-issues the SSL cert (green padlock)
+- [ ] Decide redirect direction (recommend `www` → apex, or vice versa) and set it
+
+**Done when:** `https://mohakash.xyz` serves the site with a valid certificate.
+
+---
+
+## Part 4 — Cloudflare adapter + Keystatic in GitHub mode (the big code change)
+
+**Goal:** log in at `mohakash.xyz/keystatic`, edit content, and have it commit
+back to GitHub → auto-redeploy.
+**Depends on:** Part 3 (needs the live domain for the GitHub App callback).
+
+**Code changes (I do these):**
+- [ ] Install the Cloudflare adapter: `npx astro add cloudflare`
+- [ ] Update `astro.config.mjs`: add the adapter; always include `react()` + `keystatic()` (drop the dev-only `KEYSTATIC=true` gate — it existed only to keep GitHub Pages static, which no longer applies). Site stays prerendered; only Keystatic's routes run server-side.
+- [ ] Update `keystatic.config.ts` storage: `local` in dev / `github` (with `repo: 'owner/name'`) in prod
+- [ ] Keep the `"overrides": { "vite": "^7" }` in `package.json` (still required — removing it breaks the Keystatic UI)
+
+**Dashboard / secrets (you do these, I guide):**
+- [ ] Run Keystatic's GitHub App setup flow → creates the App, gives 4 values
+- [ ] Add these as **Cloudflare Pages → Settings → Environment variables**:
+  - `KEYSTATIC_GITHUB_CLIENT_ID`
+  - `KEYSTATIC_GITHUB_CLIENT_SECRET`
+  - `KEYSTATIC_SECRET` (random string)
+  - `PUBLIC_KEYSTATIC_GITHUB_APP_SLUG`
+- [ ] Choose commit mode: **direct to `main`** (simplest) or **Pull Requests** (review step)
+
+**Verify:**
+- [ ] Visit `mohakash.xyz/keystatic` → log in with GitHub
+- [ ] Make a tiny test edit → confirm it creates a commit in the GitHub repo
+- [ ] Confirm Cloudflare Pages rebuilds and the change appears live
+
+**Done when:** an edit made in the browser shows up as a GitHub commit and then
+on the live site.
+
+---
+
+## Part 5 — Contact form (Pages Function + Resend + Turnstile)
+
+**Goal:** the contact form actually emails you, with spam protection.
+**Depends on:** Part 3 (domain) for Resend verification. Independent of Part 4.
+
+**Resend setup (you, I guide):**
+- [ ] Create Resend account → **Add domain** `mohakash.xyz`
+- [ ] Resend gives DNS records (DKIM/SPF/DMARC) → add them in **Cloudflare DNS** → verify
+- [ ] Create a Resend **API key**
+
+**Turnstile setup (you):**
+- [ ] Cloudflare → **Turnstile** → add a widget for `mohakash.xyz` → get **Site key** + **Secret key**
+
+**Code (I do):**
+- [ ] Add `functions/api/contact.ts` (Pages Function): verify the Turnstile token, then send the message via Resend to your inbox
+- [ ] Add the Turnstile widget to `ContactForm.astro` and include its token in the POST
+- [ ] Point `PUBLIC_CONTACT_ENDPOINT` at `/api/contact`
+
+**Env vars in Cloudflare Pages:**
+- [ ] `RESEND_API_KEY`
+- [ ] `TURNSTILE_SECRET_KEY`
+- [ ] `PUBLIC_TURNSTILE_SITE_KEY`
+- [ ] `CONTACT_TO_EMAIL` (soulfulwater@gmail.com)
+- [ ] `PUBLIC_CONTACT_ENDPOINT` = `/api/contact`
+
+**Verify:**
+- [ ] Submit the form on the live site → email lands in your inbox
+- [ ] Confirm the honeypot + Turnstile block obvious spam
+
+**Done when:** a real submission reaches your inbox and spam is filtered.
+
+---
+
+## Part 6 — Newsletter (Kit)
+
+**Goal:** the newsletter form captures subscribers into Kit.
+**Depends on:** the site being live (Part 2/3). Independent of Parts 4–5.
+
+**Kit setup (you):**
+- [ ] Create Kit account → create an **audience/form**
+- [ ] Grab the form's endpoint (and, if we proxy, an API key)
+
+**Code (I do) — two options, pick one:**
+- [ ] **Simple:** point `PUBLIC_NEWSLETTER_ENDPOINT` at Kit's hosted form action and map the field name Kit expects
+- [ ] **Cleaner (recommended):** small Pages Function `functions/api/subscribe.ts` that calls Kit's API (keeps the API key server-side, lets us keep our own JSON shape + success UI)
+
+**Env vars (if using the proxy):**
+- [ ] `KIT_API_KEY`
+- [ ] `KIT_FORM_ID`
+- [ ] `PUBLIC_NEWSLETTER_ENDPOINT` = `/api/subscribe`
+
+**Verify:**
+- [ ] Subscribe with a test email on the live site → it appears in Kit
+- [ ] Confirm Kit's confirmation/welcome email behaves as you want
+
+**Done when:** a signup on the site shows up as a Kit subscriber.
+
+---
+
+## Part 7 — Go-live polish & content
+
+**Goal:** replace placeholders, final checks, real launch.
+**Depends on:** Parts 4–6 (so CMS edits + forms are all working).
+
+- [ ] ~~Portrait~~ — already done (`/uploads/portraitLight.png` + `/uploads/portraitDark.png` exist & wired). Swap for nicer photos only if you want.
+- [ ] Replace 5 placeholder **social URLs** in `src/data/social.json` (currently bare domains): GitHub `https://github.com/`, X `https://x.com/`, LinkedIn, Instagram, Facebook
+- [ ] Replace the placeholder **repo URL** in `src/content/projects/personal-site.md` (`repo: "https://github.com/"`) — fill in once the repo exists (Part 1)
+- [ ] Personalize the **About** section copy (education, etc.)
+- [ ] Verify SEO basics: page titles/meta, sitemap, RSS feed
+- [ ] Test on mobile + both light/dark themes on the live domain
+- [ ] Final end-to-end pass: CMS edit → commit → redeploy → contact email → newsletter signup
+
+**Done when:** everything above is real (no placeholders) and verified on `mohakash.xyz`.
+
+---
+
+## Master environment-variable list (for Cloudflare Pages settings)
+
+| Variable | Part | Public? | Purpose |
+|---|---|---|---|
+| `KEYSTATIC_GITHUB_CLIENT_ID` | 4 | no | Keystatic GitHub App |
+| `KEYSTATIC_GITHUB_CLIENT_SECRET` | 4 | no | Keystatic GitHub App |
+| `KEYSTATIC_SECRET` | 4 | no | Keystatic session signing |
+| `PUBLIC_KEYSTATIC_GITHUB_APP_SLUG` | 4 | yes | Keystatic GitHub App slug |
+| `RESEND_API_KEY` | 5 | no | Send contact email |
+| `TURNSTILE_SECRET_KEY` | 5 | no | Verify anti-spam token |
+| `PUBLIC_TURNSTILE_SITE_KEY` | 5 | yes | Turnstile widget |
+| `CONTACT_TO_EMAIL` | 5 | no | Where messages go |
+| `PUBLIC_CONTACT_ENDPOINT` | 5 | yes | `/api/contact` |
+| `KIT_API_KEY` | 6 | no | Newsletter (if proxied) |
+| `KIT_FORM_ID` | 6 | no | Newsletter form |
+| `PUBLIC_NEWSLETTER_ENDPOINT` | 6 | yes | `/api/subscribe` or Kit URL |
+
+---
+
+## Dependency order at a glance
+
+```
+Part 0  Local build OK
+  └─ Part 1  GitHub repo
+       └─ Part 2  Cloudflare Pages deploy (*.pages.dev)
+            └─ Part 3  Custom domain + DNS  (mohakash.xyz live)
+                 ├─ Part 4  Adapter + Keystatic GitHub mode
+                 ├─ Part 5  Contact form (Resend + Turnstile)   ─┐ Parts 4,5,6
+                 └─ Part 6  Newsletter (Kit)                     │ are independent
+                      └─ Part 7  Polish & go-live  ◄─────────────┘ of each other
+```
+
+Parts 4, 5, and 6 all only need Part 3 done — we can do them in any order once
+the domain is live, but the list above is the recommended sequence.

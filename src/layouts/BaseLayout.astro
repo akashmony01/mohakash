@@ -1,0 +1,107 @@
+---
+import '@fontsource-variable/fraunces';
+import '@fontsource-variable/inter';
+import '@fontsource/jetbrains-mono';
+import '../styles/global.css';
+
+import Starfield from '../components/Starfield.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import general from '../data/general.json';
+
+const defaultTheme = general.defaultTheme ?? 'system';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'Mohammed Akash — the infinite sky',
+  description = 'Mohammed Akash (moh·akash, “the infinite sky”) — web developer, researcher, and poet. Projects, poetry, research, and notes on building with Claude.',
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Set theme before paint to avoid a flash of the wrong mode. The
+         site-wide default (dark / light / system) is CMS-editable. -->
+    <script is:inline define:vars={{ defaultTheme }}>
+      (function () {
+        try {
+          var saved = localStorage.getItem('theme');
+          var mode = saved || defaultTheme;
+          if (mode === 'system') {
+            mode = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          }
+          if (mode === 'dark') {
+            document.documentElement.classList.add('dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
+    <link rel="icon" type="image/svg+xml" href="/favicon.png" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="alternate" type="application/rss+xml" title="Mohammed Akash — Blog" href="/rss.xml" />
+  </head>
+  <body class="flex min-h-dvh flex-col">
+    <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded focus:bg-surface focus:px-3 focus:py-2 focus:text-text">
+      Skip to content
+    </a>
+    <Starfield />
+    <Header />
+    <main id="main" class="flex-1">
+      <slot />
+    </main>
+    <Footer />
+
+    <!-- Back to top -->
+    <button
+      x-data="{ show: false }"
+      x-init="window.addEventListener('scroll', () => show = window.scrollY > 700)"
+      x-show="show"
+      x-cloak
+      @click="window.scrollTo({ top: 0, behavior: 'smooth' })"
+      aria-label="Back to top"
+      class="fixed bottom-6 right-6 z-50 grid h-10 w-10 place-items-center rounded-full border border-border bg-surface/90 text-text backdrop-blur transition-colors hover:border-accent hover:text-accent"
+    >↑</button>
+
+    <!-- Play the footer wordmark animation once when it scrolls into view. -->
+    <script is:inline>
+      (function () {
+        var els = document.querySelectorAll('.brand-onview');
+        if (!els.length) return;
+        if (!('IntersectionObserver' in window)) {
+          els.forEach(function (e) { e.classList.add('brand-play'); });
+          return;
+        }
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (en) {
+            if (en.isIntersecting) {
+              en.target.classList.add('brand-play');
+              io.unobserve(en.target);
+            }
+          });
+        }, { threshold: 0.6 });
+        els.forEach(function (e) { io.observe(e); });
+      })();
+    </script>
+  </body>
+</html>

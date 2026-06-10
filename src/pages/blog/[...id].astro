@@ -1,0 +1,46 @@
+---
+import { getCollection, render } from 'astro:content';
+import ProseLayout from '../../layouts/ProseLayout.astro';
+
+export async function getStaticPaths() {
+  const posts = (await getCollection('blog')).filter((p) => !p.data.draft);
+  return posts.map((entry) => ({ params: { id: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const { title, date, category, excerpt, cover, resources } = entry.data;
+
+const readingTime = Math.max(1, Math.round((entry.body ?? '').split(/\s+/).filter(Boolean).length / 200));
+const dateStr = date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+// Prev / next within the (non-draft) blog, newest-first.
+const all = (await getCollection('blog'))
+  .filter((p) => !p.data.draft)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const i = all.findIndex((p) => p.id === entry.id);
+const newer = i > 0 ? all[i - 1] : null;
+const older = i < all.length - 1 ? all[i + 1] : null;
+---
+
+<ProseLayout
+  title={title}
+  description={excerpt}
+  eyebrow={category}
+  meta={`${dateStr} · ${readingTime} min read`}
+  cover={cover}
+  resources={resources}
+  backHref="/blog"
+  backLabel="All posts"
+>
+  <Content />
+
+  <nav class="not-prose mt-16 flex justify-between gap-4 border-t border-border pt-8 text-sm">
+    {older ? (
+      <a href={`/blog/${older.id}`} class="text-muted hover:text-accent transition-colors">← {older.data.title}</a>
+    ) : <span></span>}
+    {newer ? (
+      <a href={`/blog/${newer.id}`} class="text-right text-muted hover:text-accent transition-colors">{newer.data.title} →</a>
+    ) : <span></span>}
+  </nav>
+</ProseLayout>

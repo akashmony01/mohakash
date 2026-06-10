@@ -1,0 +1,104 @@
+---
+import ThemeToggle from './ThemeToggle.astro';
+import BrandLogo from './BrandLogo.astro';
+import nav from '../data/navigation.json';
+
+const path = Astro.url.pathname;
+const isActive = (href: string) =>
+  href === '/' ? path === '/' : path.startsWith(href);
+
+const links = nav.header;
+---
+
+<header
+  x-data="{ scrolled: false, open: false }"
+  x-init="scrolled = window.scrollY > 8; window.addEventListener('scroll', () => scrolled = window.scrollY > 8)"
+  :class="scrolled ? 'shadow-[0_6px_24px_-8px_rgba(22,25,31,0.45)]' : ''"
+  class="sticky top-0 z-50 bg-accent text-white transition-shadow duration-300"
+>
+  <nav class="mx-auto flex max-w-6xl items-center justify-between px-5 py-5">
+    <BrandLogo class="text-white" trigger="load" />
+
+    <!-- Desktop nav -->
+    <ul class="hidden items-center gap-7 sm:flex">
+      {links.map((l) => (
+        <li>
+          <a
+            href={l.href}
+            class:list={[
+              'relative text-sm font-semibold text-white transition-colors hover:text-white/65',
+            ]}
+          >
+            {l.label}
+            {isActive(l.href) && (
+              <span class="absolute -left-3 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-white" />
+            )}
+          </a>
+        </li>
+      ))}
+      <li class="flex items-center"><ThemeToggle /></li>
+      <li>
+        <a
+          href="/#contact"
+          class="btn btn-solid rounded-full px-4 py-2 text-sm font-medium [--btn-on:var(--color-accent)] [--btn:#fff]"
+        >
+          Get in touch
+        </a>
+      </li>
+    </ul>
+
+    <!-- Mobile controls -->
+    <div class="flex items-center gap-1 sm:hidden">
+      <ThemeToggle />
+      <button
+        @click.stop="open = !open"
+        class="p-1 text-white"
+        :aria-expanded="open"
+        aria-label="Toggle menu"
+      >
+        <svg x-show="!open" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        <svg x-show="open" x-cloak width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile menu -->
+  <div
+    x-show="open"
+    x-cloak
+    x-transition.origin.top
+    @click.outside="open = false"
+    class="relative overflow-hidden border-t border-white/20 bg-accent sm:hidden"
+  >
+    <!-- abstract sky elements -->
+    <div class="pointer-events-none absolute inset-0" aria-hidden="true">
+      <div class="absolute -right-16 -top-12 h-48 w-48 rounded-full bg-white/10 blur-3xl"></div>
+      <svg class="absolute -right-8 bottom-2 h-44 w-44 text-white/15" viewBox="0 0 200 200" fill="none">
+        <ellipse cx="100" cy="100" rx="92" ry="40" stroke="currentColor" stroke-width="0.8" transform="rotate(-20 100 100)" />
+        <ellipse cx="100" cy="100" rx="64" ry="64" stroke="currentColor" stroke-width="0.8" />
+      </svg>
+      <svg class="absolute inset-0 h-full w-full text-white/25" viewBox="0 0 100 100" fill="currentColor" preserveAspectRatio="none">
+        <circle cx="10" cy="14" r="0.8" /><circle cx="40" cy="8" r="0.6" /><circle cx="18" cy="60" r="0.7" /><circle cx="8" cy="88" r="0.6" />
+      </svg>
+    </div>
+
+    <ul class="relative mx-auto flex max-w-6xl flex-col divide-y divide-white/15 px-5 pb-8 pt-2">
+      {links.map((l) => (
+        <li>
+          <a
+            href={l.href}
+            @click="open = false"
+            class="block py-3.5 text-base font-semibold text-white transition-colors hover:text-white/65"
+          >{l.label}</a>
+        </li>
+      ))}
+      <li class="pt-5">
+        <a
+          href="/#contact"
+          @click="open = false"
+          class="btn btn-solid rounded-full px-5 py-2.5 text-sm font-medium [--btn-on:var(--color-accent)] [--btn:#fff]"
+        >Get in touch</a>
+      </li>
+    </ul>
+  </div>
+</header>

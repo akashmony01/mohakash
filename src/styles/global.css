@@ -1,0 +1,219 @@
+@import "tailwindcss";
+
+/* Make the `dark:` variant respond to a `.dark` class on <html> (toggled by
+   the theme button), instead of the OS `prefers-color-scheme` default. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Design tokens.
+   Light cosmic palette — open daytime sky. Warm off-white base, charcoal
+   text, bright sky-blue as the primary accent (headings + links), gold as
+   the warm "starlight" spark. Defined as theme tokens so Tailwind
+   generates matching color utilities, and as CSS variables for theming.
+*/
+@theme {
+  --color-bg: #f7f7f3;          /* warm off-white — the open sky    */
+  --color-surface: #ffffff;     /* cards, raised panels             */
+  --color-border: #e4e5ec;      /* light hairlines, dividers        */
+  --color-text: #0e1116;        /* near-black charcoal — body text  */
+  --color-muted: #2c303b;       /* dark slate — secondary text      */
+  --color-accent: #1a8fd6;      /* bright sky blue — headings, links*/
+  --color-accent-hover: #1577b5;/* deeper sky on hover              */
+  --color-spark: #1f6fb0;       /* deep sky blue — secondary accent */
+
+  /* Category accents — used as top borders / labels per section.    */
+  --color-cat-projects: #1f6fc0;/* blue    */
+  --color-cat-poetry: #b14a86;  /* magenta */
+  --color-cat-research: #1d9e75;/* teal    */
+  --color-cat-blog: #d4683a;    /* coral   */
+
+  --font-display: "Fraunces Variable", Georgia, "Times New Roman", serif;
+  --font-sans: "Inter Variable", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+/* Dark theme — toggled by adding `.dark` to <html>. Only the neutral tokens
+   flip; sky-blue accent + spark stay (the header/footer keep their blue, and
+   links/headings stay sky-blue on the night-sky background). */
+html.dark {
+  color-scheme: dark;
+  --color-bg: #0b0e1a;        /* deep night sky          */
+  --color-surface: #151a2a;   /* raised panels / cards   */
+  --color-border: #2a3346;    /* hairlines, dividers     */
+  --color-text: #e8eaf2;      /* starlight body text     */
+  --color-muted: #9aa4bd;     /* secondary text          */
+}
+
+@layer base {
+  /* Hide Alpine-controlled elements until Alpine initializes. */
+  [x-cloak] { display: none !important; }
+
+  html {
+    color-scheme: light;
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: var(--color-accent);   /* bright sky-blue headings */
+  }
+
+  ::selection {
+    background-color: color-mix(in srgb, var(--color-accent) 30%, transparent);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+}
+
+/* Standard buttons. Two shapes, one consistent hover behavior:
+   - .btn-solid : filled at rest → hollow on hover (transparent bg, colored
+     border + text).
+   - .btn-outline: hollow at rest → filled on hover (bg = border color, text
+     flips to the contrast color).
+   Set --btn (the brand color) and --btn-on (text color when filled). Defaults
+   to the sky-blue accent with white text; override per button as needed. */
+@layer components {
+  .btn {
+    --btn: var(--color-accent);
+    --btn-on: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    border: 1px solid var(--btn);
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  }
+  .btn-solid {
+    background-color: var(--btn);
+    color: var(--btn-on);
+  }
+  .btn-solid:hover {
+    background-color: transparent;
+    color: var(--btn);
+  }
+  .btn-outline {
+    background-color: transparent;
+    color: var(--btn);
+  }
+  .btn-outline:hover {
+    background-color: var(--btn);
+    color: var(--btn-on);
+  }
+}
+
+/* Animated wordmark. A vertical "reel" of two stacked panels (Mohammed Akash /
+   moh·akash) inside a fixed-height window. Slides up to reveal moh·akash, holds,
+   then slides back — one cycle, settling on the full name. */
+@layer components {
+  .brand-reel {
+    --brand-h: 1.85rem;
+    display: block;
+    height: var(--brand-h);
+    overflow: hidden;
+  }
+  .brand-track {
+    display: block;
+  }
+  .brand-panel {
+    display: flex;
+    align-items: center;
+    height: var(--brand-h);
+  }
+  .brand-play .brand-track {
+    animation: brand-cycle 9s ease-in-out infinite;
+  }
+  @keyframes brand-cycle {
+    0%, 40%   { transform: translateY(0); }
+    46%, 86%  { transform: translateY(calc(var(--brand-h) * -1)); }
+    92%, 100% { transform: translateY(0); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .brand-play .brand-track { animation: none; }
+  }
+}
+
+/* Cosmic card — soft depth at rest, lift + cyan glow on hover. */
+@layer components {
+  .card-cosmic {
+    box-shadow: 0 6px 24px rgba(43, 47, 58, 0.06);
+    transition: transform 0.2s ease, box-shadow 0.2s ease,
+      border-color 0.2s ease, background-color 0.2s ease;
+  }
+  .card-cosmic:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 34px rgba(43, 47, 58, 0.10),
+      0 0 22px rgba(26, 143, 214, 0.16);
+  }
+}
+
+/* Long-form reading: capped measure, comfortable rhythm. */
+@layer components {
+  .prose-sky {
+    max-width: 100%;
+    line-height: 1.75;
+    font-size: 1.0625rem;
+  }
+  .prose-sky h2 { font-size: 1.5rem; margin-top: 2em; margin-bottom: 0.5em; }
+  .prose-sky h3 { font-size: 1.25rem; margin-top: 1.5em; margin-bottom: 0.4em; }
+  .prose-sky p { margin-bottom: 1.15em; }
+  .prose-sky a { color: var(--color-accent); text-decoration: underline; text-underline-offset: 3px; }
+  .prose-sky a:hover { color: var(--color-accent-hover); }
+  .prose-sky blockquote {
+    border-left: 2px solid var(--color-spark);
+    padding-left: 1rem;
+    color: var(--color-muted);
+    font-style: italic;
+    margin: 1.5em 0;
+  }
+  .prose-sky code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    background: color-mix(in srgb, var(--color-text) 7%, transparent);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+  }
+  .prose-sky pre {
+    background: color-mix(in srgb, var(--color-text) 5%, transparent) !important;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 1rem 1.15rem;
+    overflow-x: auto;
+    margin: 1.5em 0;
+  }
+  .prose-sky pre code { background: transparent; padding: 0; }
+  .prose-sky ul, .prose-sky ol { margin: 1em 0 1.15em 1.25em; }
+  .prose-sky li { margin-bottom: 0.4em; }
+  .prose-sky hr { border-color: var(--color-border); margin: 2.5em 0; }
+  .prose-sky img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 1.75em auto;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+  }
+  .prose-sky figure { margin: 1.75em 0; }
+  .prose-sky figure img { margin-bottom: 0.5em; }
+  .prose-sky figcaption {
+    text-align: center;
+    font-size: 0.85em;
+    color: var(--color-muted);
+  }
+}

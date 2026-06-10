@@ -1,0 +1,97 @@
+---
+// Set PUBLIC_NEWSLETTER_ENDPOINT to your Substack/ConvertKit form action
+// (or a Worker) to capture emails. Until then it validates and shows a
+// "not connected yet" message. Email-only by design — minimal friction.
+// Copy is CMS-editable (src/data/home.json → "Home page" → Newsletter).
+import home from '../data/home.json';
+
+const endpoint = import.meta.env.PUBLIC_NEWSLETTER_ENDPOINT ?? '';
+const { badge, heading, subtext } = home.newsletter;
+---
+
+<section class="mx-auto max-w-6xl px-5 py-12">
+  <div class="relative overflow-hidden rounded-3xl border border-border bg-surface px-6 py-14 text-center shadow-[0_12px_44px_-20px_rgba(14,17,22,0.25)] sm:px-12 sm:py-16">
+    <!-- abstract sky elements -->
+    <div class="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-accent/10 blur-3xl" aria-hidden="true"></div>
+    <div class="pointer-events-none absolute -bottom-24 -left-20 h-64 w-64 rounded-full bg-accent/10 blur-3xl" aria-hidden="true"></div>
+    <svg class="pointer-events-none absolute -left-10 top-1/2 h-72 w-72 -translate-y-1/2 text-accent/10" viewBox="0 0 200 200" fill="none" aria-hidden="true">
+      <ellipse cx="100" cy="100" rx="92" ry="40" stroke="currentColor" stroke-width="0.8" transform="rotate(20 100 100)" />
+      <ellipse cx="100" cy="100" rx="92" ry="40" stroke="currentColor" stroke-width="0.8" transform="rotate(-30 100 100)" />
+    </svg>
+    <svg class="pointer-events-none absolute right-8 top-7 h-32 w-32 text-accent/15" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+      <g stroke="currentColor" stroke-width="0.8">
+        <line x1="18" y1="30" x2="44" y2="46" /><line x1="44" y1="46" x2="72" y2="34" /><line x1="44" y1="46" x2="56" y2="74" />
+      </g>
+      <g fill="currentColor">
+        <circle cx="18" cy="30" r="1.8" /><circle cx="44" cy="46" r="2.4" /><circle cx="72" cy="34" r="1.8" /><circle cx="56" cy="74" r="1.6" />
+      </g>
+    </svg>
+
+    <span class="relative inline-flex items-center gap-2 rounded-full bg-accent/10 px-4 py-1 text-xs font-medium uppercase tracking-[0.18em] text-accent ring-1 ring-accent/25">
+      <svg width="12" height="12" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M16 4 L17.8 14.2 L28 16 L17.8 17.8 L16 28 L14.2 17.8 L4 16 L14.2 14.2 Z" /></svg>
+      {badge}
+    </span>
+    <h2 class="relative mx-auto mt-5 max-w-2xl font-display text-3xl leading-tight text-accent sm:text-4xl">
+      {heading}
+    </h2>
+    <p class="relative mx-auto mt-4 max-w-xl text-muted">
+      {subtext}
+    </p>
+
+    <form
+      class="relative mx-auto mt-8 max-w-md"
+      x-data={`{
+        endpoint: ${JSON.stringify(endpoint)},
+        email: '',
+        status: 'idle',
+        msg: '',
+        async submit() {
+          this.status = 'sending'; this.msg = '';
+          if (!this.endpoint) {
+            this.status = 'error';
+            this.msg = 'Newsletter isn’t connected yet — coming soon.';
+            return;
+          }
+          try {
+            const res = await fetch(this.endpoint, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email: this.email }),
+            });
+            if (!res.ok) throw new Error('bad status');
+            this.status = 'success'; this.email = '';
+          } catch (e) {
+            this.status = 'error';
+            this.msg = 'Something went wrong. Please try again.';
+          }
+        }
+      }`}
+      @submit.prevent="submit()"
+    >
+      <div x-show="status === 'success'" x-cloak class="rounded-lg bg-accent/10 px-5 py-4 text-text">
+        Thanks — you're subscribed. Watch your inbox.
+      </div>
+
+      <div x-show="status !== 'success'" class="flex flex-col gap-3 sm:flex-row">
+        <label class="flex-1">
+          <span class="sr-only">Email address</span>
+          <input
+            type="email" required x-model="email"
+            class="w-full rounded-lg border border-border bg-bg px-4 py-3 text-text placeholder:text-muted/60 focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
+            placeholder="you@example.com"
+          />
+        </label>
+        <button
+          type="submit"
+          :disabled="status === 'sending'"
+          class="btn btn-solid rounded-lg px-7 py-3 font-medium disabled:opacity-60"
+        >
+          <span x-show="status !== 'sending'">Subscribe</span>
+          <span x-show="status === 'sending'" x-cloak>…</span>
+        </button>
+      </div>
+
+      <p x-show="status === 'error'" x-cloak class="mt-3 text-sm font-medium text-accent" x-text="msg"></p>
+    </form>
+  </div>
+</section>

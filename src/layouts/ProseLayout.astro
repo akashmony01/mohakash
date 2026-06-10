@@ -1,0 +1,80 @@
+---
+import BaseLayout from './BaseLayout.astro';
+
+interface Resource {
+  label: string;
+  href: string;
+  kind?: 'link' | 'pdf' | 'code' | 'live' | 'doc';
+}
+
+interface Props {
+  title: string;
+  description?: string;
+  eyebrow?: string;   // small label above the title (e.g. category, type)
+  meta?: string;      // small line below the title (e.g. date · reading time)
+  backHref?: string;
+  backLabel?: string;
+  cover?: string;          // optional hero image (path in public/ or URL)
+  resources?: Resource[];  // attached files / links (PDF, slides, demo…)
+}
+
+const {
+  title, description, eyebrow, meta, backHref, backLabel,
+  cover, resources = [],
+} = Astro.props;
+
+const kindIcon: Record<string, string> = {
+  pdf: '↓', doc: '↓', code: '↗', live: '↗', link: '↗',
+};
+const kindLabel: Record<string, string> = {
+  pdf: 'PDF', doc: 'Doc', code: 'Code', live: 'Live', link: 'Link',
+};
+---
+
+<BaseLayout title={`${title} — Mohammed Akash`} description={description}>
+  <article class="mx-auto max-w-6xl px-5 py-14">
+    <div>
+    {backHref && (
+      <a href={backHref} class="mb-8 inline-block text-sm text-muted hover:text-accent transition-colors">
+        ← {backLabel}
+      </a>
+    )}
+    <header class="mb-10">
+      {eyebrow && (
+        <p class="mb-3 text-xs uppercase tracking-[0.2em] text-spark">{eyebrow}</p>
+      )}
+      <h1 class="text-balance text-3xl sm:text-4xl text-text">{title}</h1>
+      {meta && <p class="mt-3 text-sm text-muted">{meta}</p>}
+    </header>
+
+    {cover && (
+      <img
+        src={cover}
+        alt=""
+        class="mb-10 w-full rounded-2xl border border-border object-cover shadow-[0_12px_40px_-18px_rgba(14,17,22,0.3)]"
+      />
+    )}
+
+    {resources.length > 0 && (
+      <div class="mb-10 flex flex-wrap gap-3 text-sm">
+        {resources.map((r) => (
+          <a
+            href={r.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn btn-outline rounded-lg px-3.5 py-1.5 font-medium"
+          >
+            <span class="text-xs uppercase tracking-wide opacity-70">{kindLabel[r.kind ?? 'link']}</span>
+            {r.label}
+            <span aria-hidden="true">{kindIcon[r.kind ?? 'link']}</span>
+          </a>
+        ))}
+      </div>
+    )}
+
+    <div class="prose-sky">
+      <slot />
+    </div>
+    </div>
+  </article>
+</BaseLayout>

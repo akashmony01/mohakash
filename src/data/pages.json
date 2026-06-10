@@ -1,0 +1,18 @@
+{
+  "projects": {
+    "title": "Akash's Work",
+    "intro": "Web work I design and build for people and ideas I believe in. Available for new projects and consulting."
+  },
+  "poetry": {
+    "title": "Akash's Poetry",
+    "intro": "Verses and fragments, written under the sky."
+  },
+  "research": {
+    "title": "Akash's Research",
+    "intro": "Notes, papers, and ongoing inquiry — questions I'm following wherever they lead."
+  },
+  "blog": {
+    "title": "Akash's Notebook",
+    "intro": "Thinking in public — daily notes on building with Claude, development, and whatever's worth keeping."
+  }
+}

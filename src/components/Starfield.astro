@@ -1,0 +1,110 @@
+---
+/*
+  Subtle, fixed starfield — felt, not shouted.
+  - Stars are placed with a deterministic pseudo-random sequence so the
+    pattern is stable across builds (no layout churn).
+  - No motion by default; a barely-there twinkle is enabled only when the
+    user has NOT requested reduced motion.
+  - Sits behind everything (z -10) and never intercepts pointer events.
+*/
+const STAR_COUNT = 70;
+
+// Tiny deterministic LCG so the sky looks the same every build.
+let seed = 1337;
+const rand = () => {
+  seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+  return seed / 0x7fffffff;
+};
+
+const stars = Array.from({ length: STAR_COUNT }, (_, i) => {
+  const r = rand();
+  return {
+    top: (rand() * 100).toFixed(3),
+    left: (rand() * 100).toFixed(3),
+    size: (r < 0.86 ? 1 : 2),                  // mostly tiny, a few brighter
+    opacity: (0.25 + rand() * 0.55).toFixed(2),
+    delay: (rand() * 6).toFixed(2),
+    gold: rand() < 0.12,                       // ~1 in 8 is a faint gold spark
+  };
+});
+---
+
+<div class="starfield" aria-hidden="true">
+  <!-- soft ambient orbs — abstract cosmic wash behind every page -->
+  <span class="orb orb-1"></span>
+  <span class="orb orb-2"></span>
+  <span class="orb orb-3"></span>
+  <!-- faint orbit ring drifting at the lower edge -->
+  <svg class="orbit" viewBox="0 0 400 200" fill="none" preserveAspectRatio="xMidYMid meet">
+    <ellipse cx="200" cy="100" rx="190" ry="64" stroke="currentColor" stroke-width="0.6" transform="rotate(-12 200 100)" />
+    <ellipse cx="200" cy="100" rx="150" ry="40" stroke="currentColor" stroke-width="0.6" transform="rotate(-12 200 100)" />
+  </svg>
+  {stars.map((s) => (
+    <span
+      class:list={["star", { gold: s.gold }]}
+      style={`top:${s.top}%;left:${s.left}%;width:${s.size}px;height:${s.size}px;--o:${s.opacity};--d:${s.delay}s;`}
+    />
+  ))}
+</div>
+
+<style>
+  .starfield {
+    position: fixed;
+    inset: 0;
+    z-index: -10;
+    pointer-events: none;
+    overflow: hidden;
+    /* a soft glow at the top, like the last light at the horizon */
+    background:
+      radial-gradient(60rem 40rem at 50% -10%, color-mix(in srgb, var(--color-accent) 14%, transparent), transparent 70%),
+      radial-gradient(45rem 32rem at 85% 110%, color-mix(in srgb, var(--color-spark) 9%, transparent), transparent 70%);
+  }
+  .orb {
+    position: absolute;
+    border-radius: 9999px;
+    filter: blur(70px);
+  }
+  .orb-1 {
+    width: 30rem; height: 30rem; top: -9rem; left: -11rem;
+    background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+  }
+  .orb-2 {
+    width: 26rem; height: 26rem; top: 28%; right: -11rem;
+    background: color-mix(in srgb, var(--color-spark) 15%, transparent);
+  }
+  .orb-3 {
+    width: 24rem; height: 24rem; bottom: -9rem; left: 22%;
+    background: color-mix(in srgb, var(--color-accent) 11%, transparent);
+  }
+  .orbit {
+    position: absolute;
+    left: 50%; bottom: -6rem;
+    width: 60rem; height: 30rem;
+    transform: translateX(-50%);
+    color: color-mix(in srgb, var(--color-accent) 22%, transparent);
+  }
+
+  .star {
+    position: absolute;
+    border-radius: 9999px;
+    background: var(--color-accent);
+    opacity: calc(var(--o) * 0.4);
+    box-shadow: 0 0 4px color-mix(in srgb, var(--color-accent) 45%, transparent);
+  }
+  .star.gold {
+    background: var(--color-spark);
+    opacity: calc(var(--o) * 0.5);
+    box-shadow: 0 0 5px color-mix(in srgb, var(--color-spark) 60%, transparent);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .star {
+      animation: twinkle 7s ease-in-out infinite;
+      animation-delay: var(--d);
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: calc(var(--o) * 0.4); }
+      50% { opacity: calc(var(--o) * 0.15); }
+    }
+  }
+</style>
