@@ -5,6 +5,12 @@ dist/
 # dependencies
 node_modules/
 
+# Lockfile intentionally NOT committed. Cloudflare's build image pins npm 10.9.2
+# while local dev uses npm 11; the two produce incompatible lockfiles for
+# Tailwind oxide's optional wasm deps (@emnapi/*), so `npm ci` fails in CI.
+# With no committed lockfile, Cloudflare runs the lenient `npm install` instead.
+package-lock.json
+
 # env
 .env
 .env.production
