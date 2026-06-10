@@ -18,3 +18,7 @@ package-lock.json
 # logs / os
 npm-debug.log*
 .DS_Store
+
+# cloudflare / misc local artifacts
+.wrangler/
+image.png

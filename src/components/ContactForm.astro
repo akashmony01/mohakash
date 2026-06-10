@@ -1,10 +1,14 @@
 ---
-// The Cloudflare Worker URL gets set later via a PUBLIC_CONTACT_ENDPOINT
-// env var (e.g. in a .env file or the build environment). Until then the
-// form renders and validates but tells the visitor it isn't connected yet.
+// The form POSTs to PUBLIC_CONTACT_ENDPOINT (set to /api/contact in the build
+// environment) which is handled by the Cloudflare Pages Function in
+// functions/api/contact.ts. Until that env var is set the form renders and
+// validates but tells the visitor it isn't connected yet.
+// PUBLIC_TURNSTILE_SITE_KEY enables the (invisible) Cloudflare Turnstile
+// anti-spam widget; without it the widget is simply omitted.
 import { socials, email } from '../config/site';
 
 const endpoint = import.meta.env.PUBLIC_CONTACT_ENDPOINT ?? '';
+const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? '';
 
 const openTo = [
   'Consulting & web projects',
@@ -87,14 +91,16 @@ const openTo = [
               return;
             }
             try {
+              const token = window.turnstile ? window.turnstile.getResponse() : '';
               const res = await fetch(this.endpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: this.form.name, email: this.form.email, message: this.form.message }),
+                body: JSON.stringify({ name: this.form.name, email: this.form.email, message: this.form.message, company: this.form.company, token }),
               });
               if (!res.ok) throw new Error('bad status');
               this.status = 'success';
               this.form = { name: '', email: '', message: '', company: '' };
+              if (window.turnstile) window.turnstile.reset();
             } catch (e) {
               this.status = 'error';
               this.errorMsg = 'Something went wrong sending that. Please try again, or email me directly.';
@@ -143,6 +149,10 @@ const openTo = [
 
           <p x-show="status === 'error'" x-cloak class="text-sm text-spark" x-text="errorMsg"></p>
 
+          {turnstileSiteKey && (
+            <div class="cf-turnstile" data-sitekey={turnstileSiteKey} data-theme="auto"></div>
+          )}
+
           <button
             type="submit"
             :disabled="status === 'sending'"
@@ -156,3 +166,7 @@ const openTo = [
     </div>
   </div>
 </section>
+
+{turnstileSiteKey && (
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer is:inline></script>
+)}

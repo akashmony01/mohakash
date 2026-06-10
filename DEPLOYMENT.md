@@ -97,7 +97,10 @@ Recreate it via the **Pages** tab instead (above), which serves `dist/` directly
 with no deploy command. The `.nvmrc` fix applies to either project type.
 
 **Done when:** the site loads correctly on the `.pages.dev` URL, and pushing to
-`main` triggers an automatic redeploy.
+`main` triggers an automatic redeploy. ✅ **PART 2 COMPLETE (2026-06-11)** —
+live at **https://mohakash.pages.dev/** (production build = commit `4ada51d`).
+Auto-deploy on push to `main` confirmed working. Per-deployment hashed preview
+URLs (e.g. `<hash>.mohakash.pages.dev`) are normal — kept for rollback history.
 
 > At this point Keystatic is still dev-only and the forms still say "not
 > connected yet" — that's expected. We're confirming hosting works first.
@@ -121,6 +124,19 @@ login and Resend (callback URLs / email domain use the real domain).
 ---
 
 ## Part 4 — Cloudflare adapter + Keystatic in GitHub mode (the big code change)
+
+> ⏸️ **DEFERRED (decided 2026-06-11).** Investigation showed this requires
+> migrating the working static **Pages** site to a Cloudflare **Workers**
+> deployment (`@astrojs/cloudflare` v13 outputs a `client`/`server` split and a
+> Worker, not the Pages `_worker.js` format) **plus a KV namespace** bound as
+> `SESSION` for login sessions. That's a significant complexity jump, and it's
+> NOT needed for the contact form (Part 5, a Pages Function) or newsletter
+> (Part 6, Kit). **Decision: keep the simple static Pages site and run Keystatic
+> in LOCAL mode for now** — edit content via `npm run cms` (→ `/keystatic`),
+> then `git push` → auto-deploys. Revisit the Workers migration as a focused
+> task after the site is fully live. The detailed steps below are kept for then.
+> (The adapter + config changes were implemented, verified, then reverted; the
+> live site is untouched.)
 
 **Goal:** log in at `mohakash.xyz/keystatic`, edit content, and have it commit
 back to GitHub → auto-redeploy.
