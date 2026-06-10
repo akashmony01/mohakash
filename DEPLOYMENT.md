@@ -120,6 +120,11 @@ login and Resend (callback URLs / email domain use the real domain).
 - [ ] Decide redirect direction (recommend `www` → apex, or vice versa) and set it
 
 **Done when:** `https://mohakash.xyz` serves the site with a valid certificate.
+✅ **PART 3 COMPLETE (2026-06-11)** — nameservers moved to Cloudflare
+(`lady`/`benedict.ns.cloudflare.com`); `mohakash.xyz` + `www` attached to the
+Pages project as custom domains, both Active with SSL. Canonicalization handled
+in `functions/_middleware.ts`: 301 `mohakash.pages.dev` → `mohakash.xyz` (the
+`.pages.dev` URL can't be disabled, only redirected) and `www` → apex.
 
 ---
 
@@ -197,6 +202,14 @@ on the live site.
 - [ ] Confirm the honeypot + Turnstile block obvious spam
 
 **Done when:** a real submission reaches your inbox and spam is filtered.
+✅ **PART 5 COMPLETE (2026-06-11)** — implemented as `functions/api/contact.ts`
+(Pages Function) + Turnstile widget in `ContactForm.astro`. Verified: a real
+submission from `mohakash.pages.dev` arrived in the inbox. Env vars set in Pages
+Production: `PUBLIC_CONTACT_ENDPOINT=/api/contact`, `PUBLIC_TURNSTILE_SITE_KEY`,
+`CONTACT_TO_EMAIL`, `RESEND_API_KEY` (secret), `TURNSTILE_SECRET_KEY` (secret).
+**Post-DNS follow-up:** once `mohakash.xyz` is verified in Resend (needs Part 3),
+set `CONTACT_FROM_EMAIL` to a `@mohakash.xyz` sender so mail comes from the
+domain instead of Resend's `onboarding@resend.dev` test sender.
 
 ---
 
