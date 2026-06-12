@@ -1,0 +1,50 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { visibleNav } from '../config/sections';
+import nav from '../data/navigation.json';
+
+// Offer the still-visible sections as a way back.
+const links = visibleNav(nav.header).filter((l) => l.href.startsWith('/') && !l.href.includes('#'));
+---
+
+<BaseLayout
+  title="Page not found — Mohammed Akash"
+  description="That page drifted off the map."
+>
+  <section class="relative mx-auto flex max-w-3xl flex-col items-center overflow-hidden px-5 py-24 text-center sm:py-32">
+    <!-- cosmic backdrop -->
+    <div class="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
+      <div class="absolute left-1/2 top-8 h-72 w-72 -translate-x-1/2 rounded-full bg-accent/15 blur-3xl"></div>
+      <svg class="absolute -left-16 top-20 h-72 w-72 text-accent/15" viewBox="0 0 200 200" fill="none">
+        <ellipse cx="100" cy="100" rx="92" ry="38" stroke="currentColor" stroke-width="0.7" transform="rotate(-25 100 100)" />
+        <ellipse cx="100" cy="100" rx="68" ry="68" stroke="currentColor" stroke-width="0.7" />
+        <circle cx="14" cy="86" r="2.4" fill="currentColor" />
+      </svg>
+      <svg class="absolute -right-16 bottom-10 h-64 w-64 text-accent/15" viewBox="0 0 200 200" fill="none">
+        <ellipse cx="100" cy="100" rx="92" ry="40" stroke="currentColor" stroke-width="0.7" transform="rotate(20 100 100)" />
+        <circle cx="186" cy="120" r="2" fill="currentColor" />
+      </svg>
+    </div>
+
+    <p class="font-display text-7xl font-semibold text-accent sm:text-8xl">404</p>
+    <h1 class="mt-4 font-display text-3xl text-text sm:text-4xl">Lost under an open sky</h1>
+    <p class="mt-4 max-w-md text-muted">
+      This page drifted off the map — or never charted at all. Let's get you back
+      to familiar stars.
+    </p>
+
+    <div class="mt-8">
+      <a href="/" class="btn btn-solid rounded-full px-5 py-2.5 font-medium">Back home →</a>
+    </div>
+
+    {links.length > 0 && (
+      <ul class="mt-10 flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm">
+        {links.map((l) => (
+          <li>
+            <a href={l.href} class="text-muted underline decoration-border underline-offset-4 transition-colors hover:text-accent hover:decoration-accent">{l.label}</a>
+          </li>
+        ))}
+      </ul>
+    )}
+  </section>
+</BaseLayout>
