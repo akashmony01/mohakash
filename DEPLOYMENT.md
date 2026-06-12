@@ -11,14 +11,16 @@ boxes as we finish.
 |---|---|---|
 | Source of truth | **GitHub** repo | Free |
 | Hosting + build | **Cloudflare Pages** (auto-deploys on git push) | Free |
-| CMS (edit anywhere) | **Keystatic** GitHub mode → commits back to the repo | Free |
+| CMS (edit anywhere) | **Sveltia CMS** (static `/admin` page) → commits back to the repo | Free |
 | Contact form | **Cloudflare Pages Function** + **Resend** + **Turnstile** | Free |
 | Newsletter | **Kit** (ConvertKit) free plan — up to 10k subscribers | Free |
 | DNS + domain | **Cloudflare DNS** | Free |
 
-**Flow once live:** edit at `mohakash.xyz/keystatic` → Keystatic commits to GitHub
+**Flow once live:** edit at `mohakash.xyz/admin` → Sveltia commits to GitHub
 → Cloudflare Pages rebuilds → site updates (~1 min). Local `git push` works the
-same way. GitHub is always the hub.
+same way. GitHub is always the hub. Sveltia is a static single-page admin (built
+in Svelte, framework-agnostic) that talks to the GitHub API directly — it needs
+**no server adapter**, so the site stays a plain static Pages deploy.
 
 ---
 
@@ -102,14 +104,14 @@ live at **https://mohakash.pages.dev/** (production build = commit `4ada51d`).
 Auto-deploy on push to `main` confirmed working. Per-deployment hashed preview
 URLs (e.g. `<hash>.mohakash.pages.dev`) are normal — kept for rollback history.
 
-> At this point Keystatic is still dev-only and the forms still say "not
+> At this point the CMS isn't wired up yet and the forms still say "not
 > connected yet" — that's expected. We're confirming hosting works first.
 
 ---
 
 ## Part 3 — Custom domain + DNS on Cloudflare
 
-**Goal:** site live on `mohakash.xyz` with HTTPS. Needed before Keystatic GitHub
+**Goal:** site live on `mohakash.xyz` with HTTPS. Needed before the CMS GitHub
 login and Resend (callback URLs / email domain use the real domain).
 **Depends on:** Part 2.
 
@@ -128,47 +130,37 @@ in `functions/_middleware.ts`: 301 `mohakash.pages.dev` → `mohakash.xyz` (the
 
 ---
 
-## Part 4 — Cloudflare adapter + Keystatic in GitHub mode (the big code change)
+## Part 4 — Sveltia CMS (edit from anywhere)
 
-> ⏸️ **DEFERRED (decided 2026-06-11).** Investigation showed this requires
-> migrating the working static **Pages** site to a Cloudflare **Workers**
-> deployment (`@astrojs/cloudflare` v13 outputs a `client`/`server` split and a
-> Worker, not the Pages `_worker.js` format) **plus a KV namespace** bound as
-> `SESSION` for login sessions. That's a significant complexity jump, and it's
-> NOT needed for the contact form (Part 5, a Pages Function) or newsletter
-> (Part 6, Kit). **Decision: keep the simple static Pages site and run Keystatic
-> in LOCAL mode for now** — edit content via `npm run cms` (→ `/keystatic`),
-> then `git push` → auto-deploys. Revisit the Workers migration as a focused
-> task after the site is fully live. The detailed steps below are kept for then.
-> (The adapter + config changes were implemented, verified, then reverted; the
-> live site is untouched.)
+> **Why Sveltia CMS (decided 2026-06-13).** It's a **single static `/admin`
+> page** (Svelte-based, but framework-agnostic) that talks to the GitHub API
+> directly and commits Markdown/JSON to the repo. No server adapter, no Workers
+> migration, no KV — it runs as-is on the existing static Pages site, and has
+> great mobile support so the site is editable from a phone. A server-rendered
+> CMS would have forced migrating this static Pages deploy to Workers + KV, which
+> we deliberately avoided.
 
-**Goal:** log in at `mohakash.xyz/keystatic`, edit content, and have it commit
-back to GitHub → auto-redeploy.
-**Depends on:** Part 3 (needs the live domain for the GitHub App callback).
+**Goal:** log in at `mohakash.xyz/admin`, edit content, and have it commit back
+to GitHub → auto-redeploy.
+**Depends on:** Part 3 (needs the live domain as the OAuth callback origin).
 
 **Code changes (I do these):**
-- [ ] Install the Cloudflare adapter: `npx astro add cloudflare`
-- [ ] Update `astro.config.mjs`: add the adapter; always include `react()` + `keystatic()` (drop the dev-only `KEYSTATIC=true` gate — it existed only to keep GitHub Pages static, which no longer applies). Site stays prerendered; only Keystatic's routes run server-side.
-- [ ] Update `keystatic.config.ts` storage: `local` in dev / `github` (with `repo: 'owner/name'`) in prod
-- [ ] Keep the `"overrides": { "vite": "^7" }` in `package.json` (still required — removing it breaks the Keystatic UI)
+- [ ] Add `public/admin/index.html` (loads the Sveltia CMS script) and `public/admin/config.yml` (collections/files mirroring `src/content.config.ts` + `src/data/*.json`, media → `public/uploads`)
+- [ ] Set the GitHub backend in `config.yml`: `backend: { name: github, repo: akashmony01/mohakash, branch: main, base_url: <auth-worker-url> }`
 
-**Dashboard / secrets (you do these, I guide):**
-- [ ] Run Keystatic's GitHub App setup flow → creates the App, gives 4 values
-- [ ] Add these as **Cloudflare Pages → Settings → Environment variables**:
-  - `KEYSTATIC_GITHUB_CLIENT_ID`
-  - `KEYSTATIC_GITHUB_CLIENT_SECRET`
-  - `KEYSTATIC_SECRET` (random string)
-  - `PUBLIC_KEYSTATIC_GITHUB_APP_SLUG`
-- [ ] Choose commit mode: **direct to `main`** (simplest) or **Pull Requests** (review step)
+**Auth (you do these, I guide) — Sveltia needs a tiny OAuth helper:**
+- [ ] Create a **GitHub OAuth App** (Settings → Developer settings → OAuth Apps) with the callback URL pointing at the auth worker
+- [ ] Deploy the free [`sveltia-cms-auth`](https://github.com/sveltia/sveltia-cms-auth) Cloudflare Worker (holds the OAuth **Client ID + Secret** as *its own* Worker secrets — they never touch the Pages project or the browser)
+- [ ] Point `config.yml`'s `base_url` at that worker
+- [ ] (Alternative for solo use: skip the worker and sign in with a repo-scoped **fine-grained PAT** — token stays in your browser)
 
 **Verify:**
-- [ ] Visit `mohakash.xyz/keystatic` → log in with GitHub
+- [ ] Visit `mohakash.xyz/admin` → log in with GitHub
 - [ ] Make a tiny test edit → confirm it creates a commit in the GitHub repo
 - [ ] Confirm Cloudflare Pages rebuilds and the change appears live
 
-**Done when:** an edit made in the browser shows up as a GitHub commit and then
-on the live site.
+**Done when:** an edit made in the browser (incl. phone) shows up as a GitHub
+commit and then on the live site.
 
 ---
 
@@ -260,10 +252,6 @@ domain instead of Resend's `onboarding@resend.dev` test sender.
 
 | Variable | Part | Public? | Purpose |
 |---|---|---|---|
-| `KEYSTATIC_GITHUB_CLIENT_ID` | 4 | no | Keystatic GitHub App |
-| `KEYSTATIC_GITHUB_CLIENT_SECRET` | 4 | no | Keystatic GitHub App |
-| `KEYSTATIC_SECRET` | 4 | no | Keystatic session signing |
-| `PUBLIC_KEYSTATIC_GITHUB_APP_SLUG` | 4 | yes | Keystatic GitHub App slug |
 | `RESEND_API_KEY` | 5 | no | Send contact email |
 | `TURNSTILE_SECRET_KEY` | 5 | no | Verify anti-spam token |
 | `PUBLIC_TURNSTILE_SITE_KEY` | 5 | yes | Turnstile widget |
@@ -272,6 +260,9 @@ domain instead of Resend's `onboarding@resend.dev` test sender.
 | `KIT_API_KEY` | 6 | no | Newsletter (if proxied) |
 | `KIT_FORM_ID` | 6 | no | Newsletter form |
 | `PUBLIC_NEWSLETTER_ENDPOINT` | 6 | yes | `/api/subscribe` or Kit URL |
+
+> Sveltia (Part 4) needs **no** variables in the Pages project — its OAuth
+> Client ID/Secret live as secrets on the separate `sveltia-cms-auth` Worker.
 
 ---
 
@@ -282,7 +273,7 @@ Part 0  Local build OK
   └─ Part 1  GitHub repo
        └─ Part 2  Cloudflare Pages deploy (*.pages.dev)
             └─ Part 3  Custom domain + DNS  (mohakash.xyz live)
-                 ├─ Part 4  Adapter + Keystatic GitHub mode
+                 ├─ Part 4  Sveltia CMS (static /admin + auth worker)
                  ├─ Part 5  Contact form (Resend + Turnstile)   ─┐ Parts 4,5,6
                  └─ Part 6  Newsletter (Kit)                     │ are independent
                       └─ Part 7  Polish & go-live  ◄─────────────┘ of each other

@@ -16,9 +16,12 @@ interface Props {
   description?: string;
 }
 
+// SEO defaults are CMS-editable (src/data/general.json → "General"); individual
+// pages can still override via the title/description props.
 const {
-  title = 'Mohammed Akash — the infinite sky',
-  description = 'Mohammed Akash (moh·akash, “the infinite sky”) — web developer, researcher, and poet. Projects, poetry, research, and notes on building with Claude.',
+  title = general.siteTitle ?? 'Mohammed Akash — the infinite sky',
+  description = general.siteDescription ??
+    'Mohammed Akash (moh·akash, “the infinite sky”) — web developer, researcher, and poet. Projects, poetry, research, and notes on building with Claude.',
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site);

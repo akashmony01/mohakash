@@ -1,0 +1,22 @@
+---
+// Sveltia CMS admin served as a real route, so the clean URL /admin works in
+// BOTH the local dev server and production (a static public/admin/index.html
+// would only resolve at /admin/ on the live host, not in `astro dev`).
+// The CMS bundle and config still live in public/admin/ and load by path.
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>Content Manager — mohakash.xyz</title>
+    <!-- Explicit config path so it resolves regardless of trailing slash. -->
+    <link href="/admin/config.yml" type="text/yaml" rel="cms-config-url" />
+  </head>
+  <body>
+    <!-- Browser build, loaded WITHOUT type="module" (is:inline keeps Astro/Vite
+         from touching it) — that's how the bundle self-boots. -->
+    <script is:inline src="/admin/sveltia-cms.js"></script>
+  </body>
+</html>

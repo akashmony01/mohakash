@@ -40,5 +40,15 @@
   "featured": {
     "heading": "Recent work",
     "tagline": "Lately shipping"
+  },
+  "contact": {
+    "eyebrow": "Contact",
+    "heading": "Let's make something under an open sky.",
+    "intro": "A project, a question, a poem you liked — the sky's open. I read everything and reply to most things within a day or two.",
+    "openTo": [
+      "Consulting & web projects",
+      "Research collaborations",
+      "A kind word about a poem"
+    ]
   }
 }

@@ -1,0 +1,302 @@
+# Sveltia CMS configuration for mohakash.xyz
+# Mirrors the Astro content schemas in src/content.config.ts and the editable
+# data files in src/data/. Edits here commit Markdown/JSON straight to the repo;
+# Cloudflare Pages then rebuilds the static site.
+
+# GitHub backend (used on the live site). For LOCAL editing you don't need this
+# to be wired up — open /admin on the dev server and click "Work with Local
+# Repository". The auth `base_url` (the sveltia-cms-auth worker) gets added in
+# the go-live step.
+backend:
+  name: github
+  repo: akashmony01/mohakash
+  branch: main
+
+# Uploaded media lands in public/uploads and is referenced by its public path.
+media_folder: "public/uploads"
+public_folder: "/uploads"
+
+# Keep editors out of search engines just in case.
+site_url: "https://mohakash.xyz"
+
+collections:
+  # ---- Blog -----------------------------------------------------------------
+  - name: blog
+    label: Blog
+    label_singular: Post
+    folder: src/content/blog
+    extension: md
+    format: frontmatter
+    create: true
+    slug: "{{slug}}"
+    summary: "{{title}} — {{date}}"
+    sortable_fields: [date, title]
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: Date, name: date, widget: datetime, date_format: "YYYY-MM-DD", time_format: false, picker_utc: true }
+      - { label: Category, name: category, widget: select, options: ["Building with Claude", "Notes", "Dev"], default: "Notes" }
+      - { label: Excerpt, name: excerpt, widget: text }
+      - { label: Draft, name: draft, widget: boolean, default: false }
+      - { label: "Hidden (keep file, hide from site)", name: hidden, widget: boolean, default: false }
+      - { label: Cover image, name: cover, widget: image, required: false }
+      - label: Resources
+        name: resources
+        widget: list
+        required: false
+        summary: "{{fields.label}}"
+        fields:
+          - { label: Label, name: label, widget: string }
+          - { label: Link/href, name: href, widget: string }
+          - { label: Kind, name: kind, widget: select, options: [link, pdf, code, live, doc], default: link }
+      - { label: Body, name: body, widget: markdown }
+
+  # ---- Poetry ---------------------------------------------------------------
+  - name: poetry
+    label: Poetry
+    label_singular: Poem
+    folder: src/content/poetry
+    extension: md
+    format: frontmatter
+    create: true
+    slug: "{{slug}}"
+    summary: "{{title}} — {{date}}"
+    sortable_fields: [date, title]
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: Date, name: date, widget: datetime, date_format: "YYYY-MM-DD", time_format: false, picker_utc: true }
+      - { label: Note, name: note, widget: text, required: false }
+      - { label: "Hidden (keep file, hide from site)", name: hidden, widget: boolean, default: false }
+      - { label: Body, name: body, widget: markdown }
+
+  # ---- Research -------------------------------------------------------------
+  - name: research
+    label: Research
+    label_singular: Entry
+    folder: src/content/research
+    extension: md
+    format: frontmatter
+    create: true
+    slug: "{{slug}}"
+    summary: "{{title}} — {{date}}"
+    sortable_fields: [date, title]
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: Date, name: date, widget: datetime, date_format: "YYYY-MM-DD", time_format: false, picker_utc: true }
+      - { label: Type, name: type, widget: select, options: [paper, note, project], default: note }
+      - { label: Abstract, name: abstract, widget: text, required: false }
+      - { label: PDF path, name: pdf, widget: string, required: false }
+      - { label: Link, name: link, widget: string, required: false }
+      - { label: "Hidden (keep file, hide from site)", name: hidden, widget: boolean, default: false }
+      - { label: Cover image, name: cover, widget: image, required: false }
+      - label: Resources
+        name: resources
+        widget: list
+        required: false
+        summary: "{{fields.label}}"
+        fields:
+          - { label: Label, name: label, widget: string }
+          - { label: Link/href, name: href, widget: string }
+          - { label: Kind, name: kind, widget: select, options: [link, pdf, code, live, doc], default: link }
+      - { label: Body, name: body, widget: markdown }
+
+  # ---- Projects -------------------------------------------------------------
+  - name: projects
+    label: Projects
+    label_singular: Project
+    folder: src/content/projects
+    extension: md
+    format: frontmatter
+    create: true
+    slug: "{{slug}}"
+    summary: "{{title}}"
+    sortable_fields: [order, year, title]
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: Summary, name: summary, widget: text }
+      - { label: Stack, name: stack, widget: list, required: false, default: [] }
+      - { label: Year, name: year, widget: number, required: false, value_type: int }
+      - { label: Link, name: link, widget: string, required: false }
+      - { label: Repo, name: repo, widget: string, required: false }
+      - { label: Featured, name: featured, widget: boolean, default: false }
+      - { label: "Hidden (keep file, hide from site)", name: hidden, widget: boolean, default: false }
+      - { label: Order, name: order, widget: number, default: 0, value_type: int }
+      - { label: Cover image, name: cover, widget: image, required: false }
+      - label: Resources
+        name: resources
+        widget: list
+        required: false
+        summary: "{{fields.label}}"
+        fields:
+          - { label: Label, name: label, widget: string }
+          - { label: Link/href, name: href, widget: string }
+          - { label: Kind, name: kind, widget: select, options: [link, pdf, code, live, doc], default: link }
+      - { label: Body, name: body, widget: markdown }
+
+  # ---- Videos (YouTube embeds) ----------------------------------------------
+  - name: videos
+    label: Videos
+    label_singular: Video
+    folder: src/content/videos
+    extension: md
+    format: frontmatter
+    create: true
+    slug: "{{slug}}"
+    summary: "{{title}}"
+    sortable_fields: [order, date, title]
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: Date, name: date, widget: datetime, date_format: "YYYY-MM-DD", time_format: false, picker_utc: true }
+      - { label: "YouTube link or video ID", name: youtube, widget: string, hint: "Paste the full YouTube URL (or just the 11-character video ID)." }
+      - { label: Description, name: description, widget: text, required: false }
+      - { label: Order, name: order, widget: number, default: 0, value_type: int }
+      - { label: "Hidden (keep file, hide from site)", name: hidden, widget: boolean, default: false }
+      - { label: Notes, name: body, widget: markdown, required: false }
+
+  # ---- Site settings (the editable JSON data files) -------------------------
+  - name: settings
+    label: Site Settings
+    editor:
+      preview: false
+    files:
+      - name: general
+        label: General
+        file: src/data/general.json
+        fields:
+          - { label: Contact email, name: email, widget: string }
+          - { label: Default theme, name: defaultTheme, widget: select, options: [light, dark], default: light }
+          - { label: Site title (SEO), name: siteTitle, widget: string }
+          - { label: Site description (SEO), name: siteDescription, widget: text }
+          - { label: Portrait (light), name: portraitLight, widget: image }
+          - { label: Portrait (dark), name: portraitDark, widget: image }
+      - name: social
+        label: Social links
+        file: src/data/social.json
+        fields:
+          - label: Socials
+            name: socials
+            widget: list
+            summary: "{{fields.label}}"
+            fields:
+              - { label: Label, name: label, widget: string }
+              - { label: URL, name: url, widget: string }
+
+      # Header + footer navigation menus
+      - name: navigation
+        label: Navigation menus
+        file: src/data/navigation.json
+        fields:
+          - label: Header menu
+            name: header
+            widget: list
+            summary: "{{fields.label}}"
+            fields:
+              - { label: Label, name: label, widget: string }
+              - { label: Link, name: href, widget: string }
+          - label: Footer menu
+            name: footer
+            widget: list
+            summary: "{{fields.label}}"
+            fields:
+              - { label: Label, name: label, widget: string }
+              - { label: Link, name: href, widget: string }
+
+      # Home page copy: hero, newsletter, about, featured, contact
+      - name: home
+        label: Home page
+        file: src/data/home.json
+        fields:
+          - label: Hero
+            name: hero
+            widget: object
+            fields:
+              - { label: Eyebrow, name: eyebrow, widget: string }
+              - { label: Name, name: name, widget: string }
+              - { label: Tagline, name: tagline, widget: string }
+              - { label: Intro, name: intro, widget: text }
+              - { label: CTA label, name: ctaLabel, widget: string }
+          - label: Newsletter
+            name: newsletter
+            widget: object
+            fields:
+              - { label: Badge, name: badge, widget: string }
+              - { label: Heading, name: heading, widget: text }
+              - { label: Subtext, name: subtext, widget: text }
+          - label: About
+            name: about
+            widget: object
+            fields:
+              - { label: Eyebrow, name: eyebrow, widget: string }
+              - { label: Heading, name: heading, widget: string }
+              - { label: Paragraphs, name: paragraphs, widget: list }
+              - label: Facts
+                name: facts
+                widget: list
+                summary: "{{fields.label}}"
+                fields:
+                  - { label: Label, name: label, widget: string }
+                  - { label: Value, name: value, widget: text }
+          - label: Featured section
+            name: featured
+            widget: object
+            fields:
+              - { label: Heading, name: heading, widget: string }
+              - { label: Tagline, name: tagline, widget: string }
+          - label: Contact
+            name: contact
+            widget: object
+            fields:
+              - { label: Eyebrow, name: eyebrow, widget: string }
+              - { label: Heading, name: heading, widget: text }
+              - { label: Intro, name: intro, widget: text }
+              - { label: "Open to (list)", name: openTo, widget: list }
+
+      # Section landing pages: title + intro for each
+      - name: pages
+        label: Section pages
+        file: src/data/pages.json
+        fields:
+          - label: Projects page
+            name: projects
+            widget: object
+            fields:
+              - { label: Title, name: title, widget: string }
+              - { label: Intro, name: intro, widget: text }
+          - label: Poetry page
+            name: poetry
+            widget: object
+            fields:
+              - { label: Title, name: title, widget: string }
+              - { label: Intro, name: intro, widget: text }
+          - label: Research page
+            name: research
+            widget: object
+            fields:
+              - { label: Title, name: title, widget: string }
+              - { label: Intro, name: intro, widget: text }
+          - label: Blog page
+            name: blog
+            widget: object
+            fields:
+              - { label: Title, name: title, widget: string }
+              - { label: Intro, name: intro, widget: text }
+          - label: Videos page
+            name: videos
+            widget: object
+            fields:
+              - { label: Title, name: title, widget: string }
+              - { label: Intro, name: intro, widget: text }
+              - { label: Channel name, name: channelName, widget: string }
+              - { label: Handle, name: handle, widget: string, required: false }
+              - { label: Channel URL, name: channelUrl, widget: string, required: false }
+              - { label: Subscribe URL, name: subscribeUrl, widget: string, required: false }
+
+      # Section show/hide toggles — turn a whole feature off without deleting it
+      - name: visibility
+        label: Visibility (show/hide sections)
+        file: src/data/visibility.json
+        fields:
+          - { label: Show Projects, name: projects, widget: boolean, default: true }
+          - { label: Show Poetry, name: poetry, widget: boolean, default: true }
+          - { label: Show Research, name: research, widget: boolean, default: true }
+          - { label: Show Blog, name: blog, widget: boolean, default: true }
+          - { label: Show Videos, name: videos, widget: boolean, default: true }
