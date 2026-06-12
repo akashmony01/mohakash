@@ -12,6 +12,14 @@ export async function getStaticPaths() {
 const { entry } = Astro.props;
 const { Content } = await render(entry);
 const { title, summary, stack, year, link, repo, cover, resources } = entry.data;
+
+// Prev / next within the (visible) projects, in the same order as the listing.
+const all = (await getCollection('projects'))
+  .filter((p) => !p.data.hidden)
+  .sort((a, b) => a.data.order - b.data.order || (b.data.year ?? 0) - (a.data.year ?? 0));
+const i = all.findIndex((p) => p.id === entry.id);
+const prev = i > 0 ? all[i - 1] : null;
+const next = i < all.length - 1 ? all[i + 1] : null;
 ---
 
 <ProseLayout
@@ -31,4 +39,13 @@ const { title, summary, stack, year, link, repo, cover, resources } = entry.data
     </div>
   )}
   <Content />
+
+  <nav class="not-prose mt-16 flex justify-between gap-4 border-t border-border pt-8 text-sm">
+    {prev ? (
+      <a href={`/projects/${prev.id}`} class="text-muted hover:text-accent transition-colors">← {prev.data.title}</a>
+    ) : <span></span>}
+    {next ? (
+      <a href={`/projects/${next.id}`} class="text-right text-muted hover:text-accent transition-colors">{next.data.title} →</a>
+    ) : <span></span>}
+  </nav>
 </ProseLayout>
