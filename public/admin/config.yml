@@ -3,16 +3,14 @@
 # data files in src/data/. Edits here commit Markdown/JSON straight to the repo;
 # Cloudflare Pages then rebuilds the static site.
 
-# GitHub backend (used on the live site). For LOCAL editing you don't need this
-# to be wired up — open /admin on the dev server and click "Work with Local
-# Repository". The auth `base_url` (the sveltia-cms-auth worker) gets added in
-# the go-live step.
+# GitHub backend. On the LIVE site, sign in with "Sign in with Token" using a
+# fine-grained Personal Access Token scoped to ONLY this repo (Contents: Read
+# and write). No OAuth app or auth worker is used. For LOCAL editing, open
+# /admin on the dev server and click "Work with Local Repository" — no token.
 backend:
   name: github
   repo: akashmony01/mohakash
   branch: main
-  # OAuth handled by the sveltia-cms-auth Worker (GitHub login on the live site).
-  base_url: https://sveltia-cms-auth.mohammed-f46.workers.dev
 
 # Uploaded media lands in public/uploads and is referenced by its public path.
 media_folder: "public/uploads"
