@@ -1,6 +1,6 @@
 // Contact + social links, sourced from CMS-editable data files
 // (src/data/general.json, src/data/social.json). Edit in the CMS
-// (npm run cms → /keystatic) or directly.
+// (Sveltia at /admin) or directly.
 import general from '../data/general.json';
 import social from '../data/social.json';
 
