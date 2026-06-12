@@ -11,6 +11,8 @@ backend:
   name: github
   repo: akashmony01/mohakash
   branch: main
+  # OAuth handled by the sveltia-cms-auth Worker (GitHub login on the live site).
+  base_url: https://sveltia-cms-auth.mohammed-f46.workers.dev
 
 # Uploaded media lands in public/uploads and is referenced by its public path.
 media_folder: "public/uploads"
