@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import home from '../data/home.json';
+import { isSectionVisible } from '../config/sections';
 
 const { heading: featuredHeading, tagline: featuredTagline } = home.featured;
 
@@ -18,10 +19,19 @@ function timeAgo(date: Date): string {
 
 const byDate = (a: any, b: any) => b.data.date.valueOf() - a.data.date.valueOf();
 
-const latestBlog = (await getCollection('blog')).filter((p) => !p.data.draft).sort(byDate)[0];
-const latestPoem = (await getCollection('poetry')).sort(byDate)[0];
-const latestResearch = (await getCollection('research')).sort(byDate)[0];
-const projectsAll = await getCollection('projects');
+// Each card respects both the section toggle and per-item "hidden".
+const latestBlog = isSectionVisible('blog')
+  ? (await getCollection('blog')).filter((p) => !p.data.draft && !p.data.hidden).sort(byDate)[0]
+  : undefined;
+const latestPoem = isSectionVisible('poetry')
+  ? (await getCollection('poetry')).filter((p) => !p.data.hidden).sort(byDate)[0]
+  : undefined;
+const latestResearch = isSectionVisible('research')
+  ? (await getCollection('research')).filter((e) => !e.data.hidden).sort(byDate)[0]
+  : undefined;
+const projectsAll = isSectionVisible('projects')
+  ? (await getCollection('projects')).filter((p) => !p.data.hidden)
+  : [];
 const featuredProject =
   projectsAll.find((p) => p.data.featured) ??
   projectsAll.sort((a, b) => a.data.order - b.data.order)[0];

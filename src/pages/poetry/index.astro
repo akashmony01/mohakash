@@ -3,10 +3,14 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import SectionHero from '../../components/SectionHero.astro';
 import pages from '../../data/pages.json';
+import { isSectionVisible } from '../../config/sections';
 
-const poems = (await getCollection('poetry')).sort(
-  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
-);
+const visible = isSectionVisible('poetry');
+const poems = visible
+  ? (await getCollection('poetry'))
+      .filter((p) => !p.data.hidden)
+      .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  : [];
 const fmt = (d: Date) => d.getFullYear();
 
 // First few lines of a poem, to hint at its vibe on the card.
@@ -20,6 +24,10 @@ function preview(body = ''): string[] {
   description="Poems by Mohammed Akash — verses and fragments written under the sky."
 >
   <section class="mx-auto max-w-6xl px-5 py-14">
+    {!visible ? (
+      <p class="py-24 text-center text-muted">This section is currently unavailable.</p>
+    ) : (
+    <>
     <SectionHero
       title={pages.poetry.title}
       intro={pages.poetry.intro}
@@ -56,6 +64,8 @@ function preview(body = ''): string[] {
           </a>
         ))}
       </div>
+    )}
+    </>
     )}
   </section>
 </BaseLayout>

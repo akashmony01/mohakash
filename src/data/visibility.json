@@ -1,0 +1,7 @@
+{
+  "projects": true,
+  "poetry": true,
+  "research": true,
+  "blog": true,
+  "videos": true
+}

@@ -1,9 +1,11 @@
 ---
 import { getCollection, render } from 'astro:content';
 import ProseLayout from '../../layouts/ProseLayout.astro';
+import { isSectionVisible } from '../../config/sections';
 
 export async function getStaticPaths() {
-  const posts = (await getCollection('blog')).filter((p) => !p.data.draft);
+  if (!isSectionVisible('blog')) return [];
+  const posts = (await getCollection('blog')).filter((p) => !p.data.draft && !p.data.hidden);
   return posts.map((entry) => ({ params: { id: entry.id }, props: { entry } }));
 }
 
@@ -14,9 +16,9 @@ const { title, date, category, excerpt, cover, resources } = entry.data;
 const readingTime = Math.max(1, Math.round((entry.body ?? '').split(/\s+/).filter(Boolean).length / 200));
 const dateStr = date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
-// Prev / next within the (non-draft) blog, newest-first.
+// Prev / next within the (visible) blog, newest-first.
 const all = (await getCollection('blog'))
-  .filter((p) => !p.data.draft)
+  .filter((p) => !p.data.draft && !p.data.hidden)
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 const i = all.findIndex((p) => p.id === entry.id);
 const newer = i > 0 ? all[i - 1] : null;

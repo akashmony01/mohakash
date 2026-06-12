@@ -2,9 +2,10 @@
 import { socials, email } from '../config/site';
 import BrandLogo from './BrandLogo.astro';
 import nav from '../data/navigation.json';
+import { visibleNav } from '../config/sections';
 
 const year = new Date().getFullYear();
-const links = nav.footer;
+const links = visibleNav(nav.footer);
 ---
 
 <footer class="relative mt-24 overflow-hidden border-t border-border bg-surface text-text backdrop-blur">

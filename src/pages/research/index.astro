@@ -3,10 +3,14 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import SectionHero from '../../components/SectionHero.astro';
 import pages from '../../data/pages.json';
+import { isSectionVisible } from '../../config/sections';
 
-const entries = (await getCollection('research')).sort(
-  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
-);
+const visible = isSectionVisible('research');
+const entries = visible
+  ? (await getCollection('research'))
+      .filter((e) => !e.data.hidden)
+      .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  : [];
 const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
 ---
 
@@ -15,6 +19,10 @@ const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month:
   description="Research by Mohammed Akash — notes, papers, and ongoing inquiry."
 >
   <section class="mx-auto max-w-6xl px-5 py-14">
+    {!visible ? (
+      <p class="py-24 text-center text-muted">This section is currently unavailable.</p>
+    ) : (
+    <>
     <SectionHero
       title={pages.research.title}
       intro={pages.research.intro}
@@ -39,6 +47,8 @@ const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month:
           </li>
         ))}
       </ul>
+    )}
+    </>
     )}
   </section>
 </BaseLayout>

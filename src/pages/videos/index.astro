@@ -1,0 +1,83 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SectionHero from '../../components/SectionHero.astro';
+import pages from '../../data/pages.json';
+import { youtubeEmbed } from '../../config/youtube';
+import { isSectionVisible } from '../../config/sections';
+
+const visible = isSectionVisible('videos');
+const ch = pages.videos;
+
+const videos = visible
+  ? (await getCollection('videos'))
+      .filter((v) => !v.data.hidden)
+      .sort((a, b) => a.data.order - b.data.order || b.data.date.valueOf() - a.data.date.valueOf())
+  : [];
+---
+
+<BaseLayout
+  title="Videos — Mohammed Akash"
+  description="Videos by Mohammed Akash — building in public on YouTube."
+>
+  <section class="mx-auto max-w-6xl px-5 py-14">
+    {!visible ? (
+      <p class="py-24 text-center text-muted">This section is currently unavailable.</p>
+    ) : (
+      <>
+        <SectionHero title={ch.title} intro={ch.intro} tint="#1a8fd6" motif="videos" />
+
+        <!-- Channel info bar -->
+        <div class="mb-10 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border bg-surface px-5 py-4">
+          <div>
+            <p class="font-display text-lg text-text">{ch.channelName}</p>
+            {ch.handle && <p class="text-sm text-muted">{ch.handle}</p>}
+          </div>
+          <div class="flex flex-wrap gap-3 text-sm">
+            {ch.channelUrl && (
+              <a href={ch.channelUrl} target="_blank" rel="noopener noreferrer" class="btn btn-outline rounded-lg px-3.5 py-1.5 font-medium">Visit channel ↗</a>
+            )}
+            {ch.subscribeUrl && (
+              <a href={ch.subscribeUrl} target="_blank" rel="noopener noreferrer" class="btn btn-solid rounded-lg px-3.5 py-1.5 font-medium">Subscribe ↗</a>
+            )}
+          </div>
+        </div>
+
+        {videos.length === 0 ? (
+          <p class="text-muted">Videos landing here soon.</p>
+        ) : (
+          <div class="grid gap-8 sm:grid-cols-2">
+            {videos.map((v) => {
+              const embed = youtubeEmbed(v.data.youtube);
+              return (
+                <div class="flex flex-col">
+                  {embed ? (
+                    <div class="aspect-video w-full overflow-hidden rounded-xl border border-border bg-black">
+                      <iframe
+                        class="h-full w-full"
+                        src={embed}
+                        title={v.data.title}
+                        loading="lazy"
+                        frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen
+                      ></iframe>
+                    </div>
+                  ) : (
+                    <div class="aspect-video w-full rounded-xl border border-border bg-surface p-4 text-sm text-muted">
+                      Invalid YouTube link — check this video's “youtube” field.
+                    </div>
+                  )}
+                  <h2 class="mt-3 font-display text-lg text-text">{v.data.title}</h2>
+                  {v.data.description && (
+                    <p class="mt-1 text-sm leading-relaxed text-muted">{v.data.description}</p>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </>
+    )}
+  </section>
+</BaseLayout>

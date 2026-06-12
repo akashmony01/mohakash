@@ -3,10 +3,14 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import SectionHero from '../../components/SectionHero.astro';
 import pages from '../../data/pages.json';
+import { isSectionVisible } from '../../config/sections';
 
-const posts = (await getCollection('blog'))
-  .filter((p) => !p.data.draft)
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const visible = isSectionVisible('blog');
+const posts = visible
+  ? (await getCollection('blog'))
+      .filter((p) => !p.data.draft && !p.data.hidden)
+      .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  : [];
 
 const categories = ['All', 'Building with Claude', 'Notes', 'Dev'] as const;
 
@@ -21,6 +25,10 @@ const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month:
   description="Thinking in public by Mohammed Akash — notes on building with Claude, development, and ideas worth keeping."
 >
   <section class="mx-auto max-w-6xl px-5 py-14" x-data="{ cat: 'All' }">
+    {!visible ? (
+      <p class="py-24 text-center text-muted">This section is currently unavailable.</p>
+    ) : (
+    <>
     <SectionHero
       title={pages.blog.title}
       intro={pages.blog.intro}
@@ -60,6 +68,8 @@ const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month:
           </a>
         ))}
       </div>
+    )}
+    </>
     )}
   </section>
 </BaseLayout>

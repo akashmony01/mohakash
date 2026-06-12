@@ -1,7 +1,7 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 
-// CMS-friendly optionals: Keystatic writes empty fields as "" or null, so
+// CMS-friendly optionals: the CMS may write empty fields as "" or null, so
 // normalize those to undefined before validating.
 const optionalString = z.preprocess(
   (v) => (v === '' || v == null ? undefined : v),
@@ -38,6 +38,7 @@ const projects = defineCollection({
     order: z.number().default(0),
     cover: optionalString,
     resources: z.array(resource).default([]),
+    hidden: z.boolean().default(false),
   }),
 });
 
@@ -47,6 +48,7 @@ const poetry = defineCollection({
     title: z.string(),
     date: z.coerce.date(),
     note: optionalString,
+    hidden: z.boolean().default(false),
   }),
 });
 
@@ -61,6 +63,7 @@ const research = defineCollection({
     link: optionalUrl,
     cover: optionalString,
     resources: z.array(resource).default([]),
+    hidden: z.boolean().default(false),
   }),
 });
 
@@ -74,7 +77,22 @@ const blog = defineCollection({
     draft: z.boolean().default(false),
     cover: optionalString,
     resources: z.array(resource).default([]),
+    hidden: z.boolean().default(false),
   }),
 });
 
-export const collections = { projects, poetry, research, blog };
+// Videos: each entry embeds one YouTube video (paste its link). The channel
+// info shown in the page hero lives in src/data/pages.json → videos.
+const videos = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/videos' }),
+  schema: z.object({
+    title: z.string(),
+    date: z.coerce.date(),
+    youtube: z.string(), // full YouTube URL or bare video ID
+    description: optionalString,
+    order: z.number().default(0),
+    hidden: z.boolean().default(false),
+  }),
+});
+
+export const collections = { projects, poetry, research, blog, videos };

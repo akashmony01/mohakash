@@ -1,9 +1,11 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { isSectionVisible } from '../../config/sections';
 
 export async function getStaticPaths() {
-  const poems = await getCollection('poetry');
+  if (!isSectionVisible('poetry')) return [];
+  const poems = (await getCollection('poetry')).filter((p) => !p.data.hidden);
   return poems.map((entry) => ({ params: { id: entry.id }, props: { entry } }));
 }
 

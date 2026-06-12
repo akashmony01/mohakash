@@ -1,9 +1,11 @@
 ---
 import { getCollection, render } from 'astro:content';
 import ProseLayout from '../../layouts/ProseLayout.astro';
+import { isSectionVisible } from '../../config/sections';
 
 export async function getStaticPaths() {
-  const entries = await getCollection('research');
+  if (!isSectionVisible('research')) return [];
+  const entries = (await getCollection('research')).filter((e) => !e.data.hidden);
   return entries.map((entry) => ({ params: { id: entry.id }, props: { entry } }));
 }
 

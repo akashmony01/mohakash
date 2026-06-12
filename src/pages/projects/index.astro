@@ -3,10 +3,14 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import SectionHero from '../../components/SectionHero.astro';
 import pages from '../../data/pages.json';
+import { isSectionVisible } from '../../config/sections';
 
-const projects = (await getCollection('projects')).sort(
-  (a, b) => a.data.order - b.data.order || (b.data.year ?? 0) - (a.data.year ?? 0),
-);
+const visible = isSectionVisible('projects');
+const projects = visible
+  ? (await getCollection('projects'))
+      .filter((p) => !p.data.hidden)
+      .sort((a, b) => a.data.order - b.data.order || (b.data.year ?? 0) - (a.data.year ?? 0))
+  : [];
 ---
 
 <BaseLayout
@@ -14,6 +18,10 @@ const projects = (await getCollection('projects')).sort(
   description="Freelance web development work by Mohammed Akash — sites and apps I design and build."
 >
   <section class="mx-auto max-w-6xl px-5 py-14">
+    {!visible ? (
+      <p class="py-24 text-center text-muted">This section is currently unavailable.</p>
+    ) : (
+    <>
     <SectionHero
       title={pages.projects.title}
       intro={pages.projects.intro}
@@ -46,6 +54,8 @@ const projects = (await getCollection('projects')).sort(
           </a>
         ))}
       </div>
+    )}
+    </>
     )}
   </section>
 </BaseLayout>

@@ -2,12 +2,13 @@
 import ThemeToggle from './ThemeToggle.astro';
 import BrandLogo from './BrandLogo.astro';
 import nav from '../data/navigation.json';
+import { visibleNav } from '../config/sections';
 
 const path = Astro.url.pathname;
 const isActive = (href: string) =>
   href === '/' ? path === '/' : path.startsWith(href);
 
-const links = nav.header;
+const links = visibleNav(nav.header);
 ---
 
 <header
