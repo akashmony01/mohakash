@@ -1,0 +1,21 @@
+# Security headers served by Cloudflare Pages for every route.
+# CSP notes: 'unsafe-inline' is required by Astro's inline theme/boot scripts and
+# Tailwind's inline styles; 'unsafe-eval' is required by Alpine.js (it evaluates
+# x-* expressions). Sources are otherwise locked to self + the few known origins
+# (YouTube embeds, the Cloudflare analytics beacon).
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(), usb=(), interest-cohort=()
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  Cross-Origin-Opener-Policy: same-origin
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self' https://cloudflareinsights.com; frame-src https://www.youtube-nocookie.com https://www.youtube.com; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests
+
+# The CMS admin SPA (Sveltia) talks to the GitHub API and pulls avatars/media from
+# several github subdomains. This more-specific rule overrides the strict site-wide
+# CSP for every /admin* path so login and commits keep working. connect/img are
+# opened to https: because it's a noindexed internal tool, not a public page.
+/admin*
+  X-Frame-Options: DENY
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https:; frame-ancestors 'none'; base-uri 'self'

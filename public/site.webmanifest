@@ -1,0 +1,14 @@
+{
+  "name": "Mohammed Akash — the infinite sky",
+  "short_name": "mohakash",
+  "description": "Mohammed Akash (moh·akash) — web developer, researcher, and poet. Projects, poetry, research, and notes on building with Claude.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f7f7f3",
+  "theme_color": "#1a8fd6",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
