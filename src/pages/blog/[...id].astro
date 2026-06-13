@@ -23,6 +23,23 @@ const all = (await getCollection('blog'))
 const i = all.findIndex((p) => p.id === entry.id);
 const newer = i > 0 ? all[i - 1] : null;
 const older = i < all.length - 1 ? all[i + 1] : null;
+
+const postUrl = new URL(`/blog/${entry.id}`, Astro.site).href;
+const schema = {
+  '@type': 'BlogPosting',
+  '@id': `${postUrl}#article`,
+  headline: title,
+  description: excerpt,
+  datePublished: date.toISOString(),
+  dateModified: date.toISOString(),
+  author: { '@id': `${Astro.site}#person` },
+  publisher: { '@id': `${Astro.site}#person` },
+  mainEntityOfPage: postUrl,
+  url: postUrl,
+  articleSection: category,
+  inLanguage: 'en',
+  ...(cover ? { image: new URL(cover, Astro.site).href } : {}),
+};
 ---
 
 <ProseLayout
@@ -32,6 +49,7 @@ const older = i < all.length - 1 ? all[i + 1] : null;
   meta={`${dateStr} · ${readingTime} min read`}
   cover={cover}
   resources={resources}
+  schema={schema}
   backHref="/blog"
   backLabel="All posts"
 >

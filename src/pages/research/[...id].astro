@@ -21,6 +21,22 @@ const all = (await getCollection('research'))
 const i = all.findIndex((e) => e.id === entry.id);
 const newer = i > 0 ? all[i - 1] : null;
 const older = i < all.length - 1 ? all[i + 1] : null;
+
+const entryUrl = new URL(`/research/${entry.id}`, Astro.site).href;
+const schema = {
+  '@type': type === 'paper' ? 'ScholarlyArticle' : 'Article',
+  '@id': `${entryUrl}#article`,
+  headline: title,
+  ...(abstract ? { description: abstract, abstract } : {}),
+  datePublished: date.toISOString(),
+  dateModified: date.toISOString(),
+  author: { '@id': `${Astro.site}#person` },
+  publisher: { '@id': `${Astro.site}#person` },
+  mainEntityOfPage: entryUrl,
+  url: entryUrl,
+  inLanguage: 'en',
+  ...(cover ? { image: new URL(cover, Astro.site).href } : {}),
+};
 ---
 
 <ProseLayout
@@ -30,6 +46,7 @@ const older = i < all.length - 1 ? all[i + 1] : null;
   meta={dateStr}
   cover={cover}
   resources={resources}
+  schema={schema}
   backHref="/research"
   backLabel="All research"
 >

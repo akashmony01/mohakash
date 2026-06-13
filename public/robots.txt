@@ -1,0 +1,59 @@
+# robots.txt for mohakash.xyz
+# Everything here is public and meant to be found — by search engines AND by
+# AI assistants. We explicitly welcome the major AI crawlers so the site can be
+# cited and surfaced in tools like ChatGPT, Claude, Perplexity, and Google's AI
+# overviews. The only thing kept out is the CMS admin route.
+
+# --- Default: allow all well-behaved crawlers ---
+User-agent: *
+Allow: /
+Disallow: /admin
+
+# --- AI / LLM crawlers (explicitly allowed) ---
+# Training + retrieval crawlers for the major assistants.
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+# Machine-readable site guide for LLMs (https://llmstxt.org)
+# See /llms.txt
+
+Sitemap: https://mohakash.xyz/sitemap-index.xml

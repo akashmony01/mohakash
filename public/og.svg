@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" fill="none">
+  <!-- Source for og.png (social/preview card). Edit this, then re-run
+       scripts/build-og.mjs to regenerate the PNG. Light-cosmic brand theme. -->
+  <defs>
+    <radialGradient id="glowA" cx="22%" cy="30%" r="55%">
+      <stop offset="0%" stop-color="#1a8fd6" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#1a8fd6" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowB" cx="88%" cy="82%" r="50%">
+      <stop offset="0%" stop-color="#1f6fb0" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#1f6fb0" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="#f7f7f3"/>
+  <rect width="1200" height="630" fill="url(#glowA)"/>
+  <rect width="1200" height="630" fill="url(#glowB)"/>
+
+  <!-- orbit rings -->
+  <g stroke="#1a8fd6" stroke-opacity="0.20" fill="none" stroke-width="1.4">
+    <ellipse cx="980" cy="150" rx="220" ry="92" transform="rotate(-18 980 150)"/>
+    <ellipse cx="980" cy="150" rx="140" ry="140"/>
+    <circle cx="1144" cy="118" r="4" fill="#1a8fd6" fill-opacity="0.6" stroke="none"/>
+    <circle cx="838" cy="196" r="3" fill="#c98b1f" fill-opacity="0.55" stroke="none"/>
+  </g>
+
+  <!-- stars -->
+  <g fill="#1a8fd6" fill-opacity="0.5">
+    <circle cx="120" cy="120" r="2.5"/>
+    <circle cx="240" cy="470" r="2"/>
+    <circle cx="520" cy="90" r="2"/>
+    <circle cx="170" cy="320" r="1.6"/>
+  </g>
+
+  <!-- accent bar -->
+  <rect x="96" y="232" width="64" height="6" rx="3" fill="#1a8fd6"/>
+
+  <!-- wordmark -->
+  <text x="94" y="330" font-family="Georgia, 'Times New Roman', serif" font-size="92" font-weight="700" fill="#14171d">Mohammed Akash</text>
+  <text x="98" y="392" font-family="Georgia, 'Times New Roman', serif" font-size="36" font-style="italic" fill="#1a8fd6">moh·akash — “the infinite sky”</text>
+
+  <!-- supporting line -->
+  <text x="98" y="470" font-family="Helvetica, Arial, sans-serif" font-size="30" fill="#3c4150">Web developer · researcher · poet — building in public with Claude.</text>
+
+  <!-- url -->
+  <text x="98" y="556" font-family="Helvetica, Arial, sans-serif" font-size="28" font-weight="700" letter-spacing="1" fill="#14171d">mohakash.xyz</text>
+</svg>

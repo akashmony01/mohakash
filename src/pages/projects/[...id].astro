@@ -20,6 +20,21 @@ const all = (await getCollection('projects'))
 const i = all.findIndex((p) => p.id === entry.id);
 const prev = i > 0 ? all[i - 1] : null;
 const next = i < all.length - 1 ? all[i + 1] : null;
+
+const projectUrl = new URL(`/projects/${entry.id}`, Astro.site).href;
+const schema = {
+  '@type': 'CreativeWork',
+  '@id': `${projectUrl}#project`,
+  name: title,
+  description: summary,
+  ...(year ? { dateCreated: String(year) } : {}),
+  author: { '@id': `${Astro.site}#person` },
+  creator: { '@id': `${Astro.site}#person` },
+  url: projectUrl,
+  ...(link ? { sameAs: link } : {}),
+  ...(stack.length ? { keywords: stack.join(', ') } : {}),
+  ...(cover ? { image: new URL(cover, Astro.site).href } : {}),
+};
 ---
 
 <ProseLayout
@@ -28,6 +43,7 @@ const next = i < all.length - 1 ? all[i + 1] : null;
   eyebrow={year ? `Project · ${year}` : 'Project'}
   cover={cover}
   resources={resources}
+  schema={schema}
   backHref="/projects"
   backLabel="All projects"
 >

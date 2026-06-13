@@ -16,11 +16,13 @@ interface Props {
   backLabel?: string;
   cover?: string;          // optional hero image (path in public/ or URL)
   resources?: Resource[];  // attached files / links (PDF, slides, demo…)
+  type?: 'website' | 'article';
+  schema?: Record<string, unknown> | Record<string, unknown>[];
 }
 
 const {
   title, description, eyebrow, meta, backHref, backLabel,
-  cover, resources = [],
+  cover, resources = [], type = 'article', schema,
 } = Astro.props;
 
 const kindIcon: Record<string, string> = {
@@ -31,7 +33,13 @@ const kindLabel: Record<string, string> = {
 };
 ---
 
-<BaseLayout title={`${title} — Mohammed Akash`} description={description}>
+<BaseLayout
+  title={`${title} — Mohammed Akash`}
+  description={description}
+  type={type}
+  schema={schema}
+  image={cover ?? '/og.png'}
+>
   <article class="mx-auto max-w-6xl px-5 py-14">
     <div>
     {backHref && (

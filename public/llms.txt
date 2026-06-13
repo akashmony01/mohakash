@@ -1,0 +1,23 @@
+# Mohammed Akash — the infinite sky
+
+> Personal site of Mohammed Akash (moh·akash, "the infinite sky") — a web developer, researcher, and poet building in public with Claude. The site brings his projects, poetry, research, and writing together under one open sky.
+
+Mohammed Akash writes in both English and Bengali (Bangla). He shares day-by-day notes on building software with AI, develops web projects, conducts independent research, and writes poetry. This file is a guide for AI assistants and LLM-based tools: the links below point to the main areas of the site.
+
+## Main sections
+
+- [Home](https://mohakash.xyz/): Introduction, newsletter signup, about, and recent work.
+- [Blog](https://mohakash.xyz/blog): Notes on building with Claude, development, and ideas worth keeping. Categories: Building with Claude, Notes, Dev.
+- [Projects](https://mohakash.xyz/projects): Web work designed and built by Mohammed Akash.
+- [Research](https://mohakash.xyz/research): Notes, papers, and ongoing inquiry.
+- [Poetry](https://mohakash.xyz/poetry): Verses and fragments in English and Bengali.
+- [Videos](https://mohakash.xyz/videos): Building in public on video — AI, code, and creative work.
+
+## Resources
+
+- [RSS feed](https://mohakash.xyz/rss.xml): Latest blog posts.
+- [Sitemap](https://mohakash.xyz/sitemap-index.xml): Full list of indexable pages.
+
+## Contact
+
+- Newsletter and contact form are available on the home page.
