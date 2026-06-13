@@ -2,18 +2,28 @@
 import '@fontsource-variable/fraunces';
 import '@fontsource-variable/inter';
 import '@fontsource/jetbrains-mono';
+// Bengali serif for the Bangla poetry. Latin fonts above lack Bengali glyphs,
+// so the browser falls through to this for Bengali codepoints automatically.
+import '@fontsource-variable/noto-serif-bengali';
 import '../styles/global.css';
 
 import Starfield from '../components/Starfield.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import general from '../data/general.json';
+import social from '../data/social.json';
 
 const defaultTheme = general.defaultTheme ?? 'system';
 
 interface Props {
   title?: string;
   description?: string;
+  /** Social/preview image (absolute path from site root). */
+  image?: string;
+  /** "website" (default) or "article" for blog/research/etc. detail pages. */
+  type?: 'website' | 'article';
+  /** Per-page JSON-LD object(s) merged into the structured-data graph. */
+  schema?: Record<string, unknown> | Record<string, unknown>[];
 }
 
 // SEO defaults are CMS-editable (src/data/general.json → "General"); individual
@@ -22,9 +32,60 @@ const {
   title = general.siteTitle ?? 'Mohammed Akash — the infinite sky',
   description = general.siteDescription ??
     'Mohammed Akash (moh·akash, “the infinite sky”) — web developer, researcher, and poet. Projects, poetry, research, and notes on building with Claude.',
+  image = '/og.png',
+  type = 'website',
+  schema,
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = new URL(image, Astro.site).href;
+const siteName = general.siteTitle ?? 'Mohammed Akash — the infinite sky';
+
+// Only emit social links that point at a real profile (placeholder entries are
+// bare domains like "https://github.com/" — skip those so the entity data is clean).
+const sameAs = social.socials
+  .map((s) => s.url)
+  .filter((u) => {
+    try { return new URL(u).pathname.replace(/\/$/, '') !== ''; } catch { return false; }
+  });
+
+// Site-wide structured data: who this is (Person) + the site (WebSite). Helps
+// search engines and AI assistants resolve "Mohammed Akash" to a clear entity.
+const baseGraph: Record<string, unknown>[] = [
+  {
+    '@type': 'Person',
+    '@id': `${Astro.site}#person`,
+    name: 'Mohammed Akash',
+    alternateName: 'moh·akash',
+    url: Astro.site?.href,
+    image: new URL(general.portraitLight ?? '/og.png', Astro.site).href,
+    jobTitle: 'Web developer, researcher, and poet',
+    description:
+      'Web developer, researcher, and poet building in public with Claude. Writes in English and Bengali.',
+    ...(general.email ? { email: general.email } : {}),
+    ...(sameAs.length ? { sameAs } : {}),
+  },
+  {
+    '@type': 'WebSite',
+    '@id': `${Astro.site}#website`,
+    url: Astro.site?.href,
+    name: siteName,
+    description,
+    inLanguage: 'en',
+    publisher: { '@id': `${Astro.site}#person` },
+  },
+];
+
+const extra = schema ? (Array.isArray(schema) ? schema : [schema]) : [];
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [...baseGraph, ...extra],
+};
+
+// Cloudflare Web Analytics (cookieless). Renders only when PUBLIC_CF_BEACON_TOKEN
+// is set in the Pages env, so local/dev builds stay clean. (You can instead enable
+// auto-injection in the Cloudflare dashboard and skip the env var entirely.)
+const cfBeacon = import.meta.env.PUBLIC_CF_BEACON_TOKEN;
 ---
 
 <!doctype html>
@@ -49,20 +110,47 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
         } catch (e) {}
       })();
     </script>
-    <link rel="icon" type="image/svg+xml" href="/favicon.png" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#1a8fd6" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0b0e1a" media="(prefers-color-scheme: dark)" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <meta name="author" content="Mohammed Akash" />
     <link rel="canonical" href={canonical} />
     <meta name="generator" content={Astro.generator} />
 
+    <!-- Let search engines + AI overviews show full snippets and large image
+         previews (max-snippet:-1 = no length limit). -->
+    <meta
+      name="robots"
+      content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"
+    />
+
     <!-- Open Graph -->
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={type} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
-    <meta name="twitter:card" content="summary_large_image" />
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:alt" content={title} />
 
+    <!-- Twitter / X card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
     <link rel="alternate" type="application/rss+xml" title="Mohammed Akash — Blog" href="/rss.xml" />
+
+    <!-- Structured data (schema.org) — site-wide Person + WebSite, plus any
+         per-page schema (e.g. BlogPosting) passed in via the `schema` prop. -->
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
   </head>
   <body class="flex min-h-dvh flex-col">
     <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded focus:bg-surface focus:px-3 focus:py-2 focus:text-text">
@@ -106,5 +194,14 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
         els.forEach(function (e) { io.observe(e); });
       })();
     </script>
+
+    {cfBeacon && (
+      <script
+        is:inline
+        defer
+        src="https://static.cloudflareinsights.com/beacon.min.js"
+        data-cf-beacon={`{"token": "${cfBeacon}"}`}
+      ></script>
+    )}
   </body>
 </html>

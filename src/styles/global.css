@@ -26,8 +26,8 @@
   --color-cat-research: #1d9e75;/* teal    */
   --color-cat-blog: #d4683a;    /* coral   */
 
-  --font-display: "Fraunces Variable", Georgia, "Times New Roman", serif;
-  --font-sans: "Inter Variable", system-ui, -apple-system, sans-serif;
+  --font-display: "Fraunces Variable", "Noto Serif Bengali Variable", Georgia, "Times New Roman", serif;
+  --font-sans: "Inter Variable", "Noto Serif Bengali Variable", system-ui, -apple-system, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
