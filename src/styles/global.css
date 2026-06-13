@@ -173,8 +173,11 @@ html.dark {
   .prose-sky h2 { font-size: 1.5rem; margin-top: 2em; margin-bottom: 0.5em; }
   .prose-sky h3 { font-size: 1.25rem; margin-top: 1.5em; margin-bottom: 0.4em; }
   .prose-sky p { margin-bottom: 1.15em; }
-  .prose-sky a { color: var(--color-accent); text-decoration: underline; text-underline-offset: 3px; }
-  .prose-sky a:hover { color: var(--color-accent-hover); }
+  /* Style real content links, but leave .btn buttons alone — otherwise these
+     higher-specificity rules force button text blue (blue-on-blue in the filled
+     states) and add an underline. */
+  .prose-sky a:not(.btn) { color: var(--color-accent); text-decoration: underline; text-underline-offset: 3px; }
+  .prose-sky a:not(.btn):hover { color: var(--color-accent-hover); }
   .prose-sky blockquote {
     border-left: 2px solid var(--color-spark);
     padding-left: 1rem;
