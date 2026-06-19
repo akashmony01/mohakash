@@ -36,10 +36,27 @@ const featuredProject =
   projectsAll.find((p) => p.data.featured) ??
   projectsAll.sort((a, b) => a.data.order - b.data.order)[0];
 
-// First few lines of a poem, joined as a single quoted preview.
+// First few lines of a poem, joined as a single quoted preview. We take up to 5
+// lines here (the homepage card); the 220-char clip + line-clamp-6 keep it from
+// overflowing if those lines are long.
 function poemPreview(body = ''): string {
-  const lines = body.trim().split('\n').map((l) => l.trim()).filter(Boolean).slice(0, 3);
+  const lines = body.trim().split('\n').map((l) => l.trim()).filter(Boolean).slice(0, 5);
   return lines.join(' / ');
+}
+
+// Homepage cards show only a short slice of the (possibly long) excerpt so the
+// boxes stay uniform. The full text still lives in the post; this only clips
+// what the card displays. Cuts on a word boundary and adds an ellipsis.
+const EXCERPT_MAX = 140;
+// Poems get a higher cap: they show 3 whole lines, and Bengali fits more
+// characters per line, so 140 would cut a poem mid-line.
+const POEM_EXCERPT_MAX = 220;
+function clip(text = '', max = EXCERPT_MAX): string {
+  const t = text.trim();
+  if (t.length <= max) return t;
+  const cut = t.slice(0, max);
+  const lastSpace = cut.lastIndexOf(' ');
+  return (lastSpace > max * 0.6 ? cut.slice(0, lastSpace) : cut).replace(/[\s.,;:!?–-]+$/, '') + '…';
 }
 
 type Card = {
@@ -104,8 +121,8 @@ const textClass: Record<string, string> = {
             <span class="text-xs text-muted">{c.meta}</span>
           </div>
           <h3 class="mt-3 font-display text-lg leading-snug text-text">{c.title}</h3>
-          <p class={`mt-2 flex-1 text-sm leading-relaxed text-muted ${c.quote ? 'italic' : ''}`}>
-            {c.quote ? `“${c.preview}”` : c.preview}
+          <p class={`mt-2 flex-1 text-sm leading-relaxed text-muted ${c.quote ? 'line-clamp-6 italic' : 'line-clamp-4'}`}>
+            {c.quote ? `“${clip(c.preview, POEM_EXCERPT_MAX)}”` : clip(c.preview)}
           </p>
           <span class={`mt-5 text-sm ${textClass[c.color]} transition-transform duration-200 group-hover:translate-x-1`}>{c.cta} →</span>
         </a>

@@ -11,7 +11,11 @@ const poems = visible
       .filter((p) => !p.data.hidden)
       .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
   : [];
-const fmt = (d: Date) => d.getFullYear();
+// Month + year only — a poem can span several days, so we don't show an exact
+// day (and the stored day is synthetic for most imports anyway). UTC keeps the
+// month stable regardless of the viewer's timezone.
+const fmt = (d: Date) =>
+  d.toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
 
 // First few lines of a poem, to hint at its vibe on the card.
 function preview(body = ''): string[] {

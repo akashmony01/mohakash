@@ -13,7 +13,7 @@ const { entry } = Astro.props;
 const { title, date, note } = entry.data;
 // Render the poem's exact lines — Markdown would collapse single line breaks.
 const body = entry.body?.trim() ?? '';
-const dateStr = String(date.getUTCFullYear());
+const dateStr = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
 
 // Prev / next within the (visible) poems, newest-first like the listing.
 const all = (await getCollection('poetry'))

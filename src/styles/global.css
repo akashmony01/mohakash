@@ -193,8 +193,12 @@ html.dark {
     border-radius: 4px;
   }
   .prose-sky pre {
-    background: color-mix(in srgb, var(--color-text) 5%, transparent) !important;
-    border: 1px solid var(--color-border);
+    /* Code blocks stay dark in BOTH light and dark mode. The Shiki theme
+       (github-dark) renders light-colored syntax tokens, which only have good
+       contrast on a dark background — forcing a light bg in light mode made the
+       text nearly invisible. */
+    background: #0d1117 !important;
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 8px;
     padding: 1rem 1.15rem;
     overflow-x: auto;
