@@ -3,7 +3,7 @@
     "eyebrow": "Hi there, this is",
     "name": "Mohammed Akash",
     "tagline": "moh·akash — “the infinite sky”",
-    "intro": "A web developer, researcher, and poet — lately building in public with Claude and sharing the journey, day by day.",
+    "intro": "A freelance web developer and researcher who writes poetry now and then, mostly in Bengali — building in public with Claude, and writing it down day by day.",
     "ctaLabel": "Get in touch ↓"
   },
   "newsletter": {
@@ -15,25 +15,34 @@
     "eyebrow": "About",
     "heading": "A little about me",
     "paragraphs": [
-      "I'm Mohammed Akash — moh·akash, “the infinite sky.” I started out building websites for clients, and over time my curiosity pulled me toward research and writing as much as code.",
-      "Now I'm focused on building in public with Claude — sharing what I learn, where I get things wrong, and the small wins along the way. Between projects I study what fascinates me and write poetry to keep the other half of my brain awake."
+      "I'm Mohammed Akash — moh·akash, “the infinite sky.” I build for the web, chase research questions wherever they lead, and write poetry now and then — mostly in Bengali. I'm based in Bangladesh and work with people just about anywhere.",
+      "The foundation is freelance web development — around seven years of it now, for clients across roughly twenty countries, a five-star rating the whole way, and a few hundred projects behind me. That work taught me how to ship, how to listen, and how to make things people actually use.",
+      "Lately I'm pulling the other threads tighter. I published my first conference paper — a graph neural network for Banglish spell correction, at ICCIT 2025 — with a few more in progress, and I'm documenting what it's really like to build software in public with Claude, day by day. And I still scribble the odd poem, mostly to keep the other half of my brain awake."
     ],
     "facts": [
       {
+        "label": "Based in",
+        "value": "Bangladesh — working with clients worldwide."
+      },
+      {
         "label": "Background",
-        "value": "Freelance web developer, now writing & building in public."
+        "value": "Freelance web developer, ~7 years and counting."
       },
       {
         "label": "Education",
-        "value": "Computer science, with a long detour through the humanities."
+        "value": "BSc in Computer Science & Engineering, Bangladesh University of Business and Technology."
       },
       {
-        "label": "These days",
-        "value": "Documenting what it’s like to build with Claude — day by day."
+        "label": "Research",
+        "value": "NLP & machine learning — first paper at ICCIT 2025, on Banglish normalization."
+      },
+      {
+        "label": "Writing",
+        "value": "Poems now and then — mostly Bengali — plus notes on building with AI."
       },
       {
         "label": "The goal",
-        "value": "To become a clear, trusted voice on building with AI."
+        "value": "To make honest things, stay curious, and understand the world a little better."
       }
     ]
   },
