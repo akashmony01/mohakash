@@ -8,6 +8,11 @@ import home from '../data/home.json';
 import general from '../data/general.json';
 
 const { hero } = home;
+// Split the name so the lead word sits solid and the rest renders as hollow,
+// outlined display type (poster style) — e.g. "Mohammed" / "Akash".
+const heroWords = hero.name.trim().split(/\s+/);
+const heroLead = heroWords[0];
+const heroRest = heroWords.slice(1).join(' ');
 ---
 
 <BaseLayout>
@@ -27,8 +32,8 @@ const { hero } = home;
       </svg>
     </div>
 
-    <div class="mx-auto max-w-6xl px-5 pt-20 pb-20 sm:pt-28">
-    <div class="grid items-center gap-10 sm:grid-cols-[minmax(0,20rem)_1fr] sm:gap-14">
+    <div class="mx-auto max-w-6xl px-5 pt-20 pb-12 sm:pt-28">
+    <div class="grid items-center gap-10 sm:grid-cols-[2fr_3fr] sm:gap-14">
       <!-- Portrait. Swap the src below for a real photo; treatment applies automatically. -->
       <div class="relative mx-auto w-52 sm:mx-0 sm:w-full">
         <!-- abstract offset glow frame -->
@@ -71,16 +76,15 @@ const { hero } = home;
 
       <!-- Name + story -->
       <div class="text-center sm:text-left">
-        <p class="text-sm font-medium text-muted">{hero.eyebrow}</p>
-        <h1 class="mt-2 font-display text-5xl leading-[1.04] tracking-tight text-accent sm:text-6xl">
-          {hero.name}
-        </h1>
-
-        <div class="mt-5 flex items-center justify-center gap-3 text-sm text-muted sm:justify-start">
-          <span class="h-px w-8 bg-border"></span>
-          <span>{hero.tagline}</span>
-          <span class="h-px w-8 bg-border sm:hidden"></span>
+        <div class="flex items-center justify-center gap-3 text-lg text-muted sm:justify-start">
+          <span class="h-px w-8 bg-current opacity-50"></span>
+          <span>{hero.eyebrow}</span>
+          <span class="h-px w-8 bg-current sm:hidden opacity-50"></span>
         </div>
+        <h1 class="mt-7 font-display text-6xl leading-[0.92] text-accent sm:text-7xl lg:text-8xl">
+          <span class="block">{heroLead}</span>
+          {heroRest && <span class="block text-hollow">{heroRest}</span>}
+        </h1>
 
         <p class="mt-7 max-w-md text-pretty text-lg leading-relaxed text-muted">
           {hero.intro}

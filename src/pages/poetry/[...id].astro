@@ -10,7 +10,7 @@ export async function getStaticPaths() {
 }
 
 const { entry } = Astro.props;
-const { title, date, note } = entry.data;
+const { title, date } = entry.data;
 // Render the poem's exact lines — Markdown would collapse single line breaks.
 const body = entry.body?.trim() ?? '';
 const dateStr = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
@@ -28,7 +28,6 @@ const schema = {
   '@type': 'Poem',
   '@id': `${poemUrl}#poem`,
   name: title,
-  ...(note ? { description: note } : {}),
   datePublished: date.toISOString(),
   author: { '@id': `${Astro.site}#person` },
   publisher: { '@id': `${Astro.site}#person` },
@@ -37,7 +36,7 @@ const schema = {
 };
 ---
 
-<BaseLayout title={`${title} — Mohammed Akash`} description={`A poem by Mohammed Akash. ${note ?? ''}`.trim()} type="article" schema={schema}>
+<BaseLayout title={`${title} — Mohammed Akash`} description={`A poem by Mohammed Akash — ${title}.`} type="article" schema={schema}>
   <article class="relative mx-auto max-w-2xl overflow-visible px-5 py-16 text-center">
     <!-- abstract reading-room sky -->
     <div class="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
@@ -56,16 +55,15 @@ const schema = {
       </svg>
     </div>
 
-    <a href="/poetry" class="relative mb-12 inline-block text-sm text-muted hover:text-accent transition-colors">← All poems</a>
+    <a href="/poetry" class="relative mb-12 inline-block text-sm text-muted hover:text-accent transition-colors">← Back To All Poems</a>
 
     <h1 class="relative font-display text-3xl text-text sm:text-4xl">{title}</h1>
 
-    <div class="relative mx-auto mt-12 max-w-prose whitespace-pre-line font-display text-lg leading-loose text-text/90">
+    <div class="relative mx-auto mt-12 max-w-prose whitespace-pre-line font-sans text-lg leading-loose text-text/90">
       {body}
     </div>
 
     <footer class="relative mt-14 text-sm text-muted">
-      {note && <p class="mb-2 italic">{note}</p>}
       <p>{dateStr}</p>
     </footer>
 

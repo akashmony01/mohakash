@@ -4,9 +4,60 @@
 import home from '../data/home.json';
 
 const { eyebrow, heading, paragraphs, facts } = home.about;
+
+// Outline the last two words of the heading for poster-style emphasis.
+const hWords = heading.split(' ');
+const hTail = hWords.slice(-2).join(' ');
+const hHead = hWords.slice(0, -2).join(' ');
+
+// A line icon for each fact, matched by keyword so the icons still resolve if
+// the labels are edited in the CMS; falls back to a star.
+const ICONS = {
+  pin: '<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>',
+  briefcase: '<rect width="20" height="14" x="2" y="7" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>',
+  cap: '<path d="M21.42 10.92a1 1 0 0 0-.02-1.84L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.83l8.57 3.91a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/>',
+  flask: '<path d="M10 2v7.31"/><path d="M14 9.3V1.99"/><path d="M8.5 2h7"/><path d="M14 9.3a6.5 6.5 0 1 1-4 0"/><path d="M5.52 16h12.96"/>',
+  pen: '<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
+  target: '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
+  star: '<path d="M12 2.5l2.6 5.9 6.4.6-4.8 4.3 1.4 6.3L12 16.9 6.4 19.6l1.4-6.3L3 9l6.4-.6z"/>',
+};
+function iconFor(label = '') {
+  const l = label.toLowerCase();
+  if (l.includes('based') || l.includes('location') || l.includes('live')) return ICONS.pin;
+  if (l.includes('background') || l.includes('experience') || l.includes('work')) return ICONS.briefcase;
+  if (l.includes('education') || l.includes('degree') || l.includes('study')) return ICONS.cap;
+  if (l.includes('research')) return ICONS.flask;
+  if (l.includes('writ') || l.includes('poet')) return ICONS.pen;
+  if (l.includes('goal') || l.includes('aim') || l.includes('mission')) return ICONS.target;
+  return ICONS.star;
+}
+
+// A larger, abstract corner motif for each box — line-art in the site's cosmic
+// style, themed to the box's topic — to fill the empty space at the bottom.
+// Faint sky-blue accent reads well on both the white and the dark surface.
+// Matched by the same keywords as the icons.
+const DECOR = {
+  ripple: '<circle cx="50" cy="50" r="12"/><circle cx="50" cy="50" r="26"/><circle cx="50" cy="50" r="40"/><circle cx="50" cy="50" r="4" fill="currentColor"/>',
+  bars: '<rect x="20" y="55" width="10" height="30" rx="2"/><rect x="38" y="42" width="10" height="43" rx="2"/><rect x="56" y="30" width="10" height="55" rx="2"/><rect x="74" y="18" width="10" height="67" rx="2"/>',
+  book: '<path d="M18 68 Q50 56 82 68"/><path d="M18 58 Q50 46 82 58"/><path d="M18 48 Q50 36 82 48"/>',
+  network: '<line x1="25" y1="60" x2="50" y2="38"/><line x1="50" y1="38" x2="78" y2="52"/><line x1="50" y1="38" x2="58" y2="20"/><line x1="25" y1="60" x2="55" y2="76"/><circle cx="25" cy="60" r="4" fill="currentColor"/><circle cx="50" cy="38" r="5" fill="currentColor"/><circle cx="78" cy="52" r="4" fill="currentColor"/><circle cx="58" cy="20" r="3.5" fill="currentColor"/><circle cx="55" cy="76" r="3.5" fill="currentColor"/>',
+  waves: '<path d="M16 52 C30 40 42 64 56 52 S82 40 88 52"/><path d="M16 66 C30 54 42 78 56 66 S82 54 88 66"/>',
+  star: '<path d="M50 16 L57 43 L84 50 L57 57 L50 84 L43 57 L16 50 L43 43 Z"/>',
+  constellation: '<line x1="30" y1="40" x2="60" y2="30"/><line x1="60" y1="30" x2="72" y2="60"/><line x1="72" y1="60" x2="40" y2="68"/><circle cx="30" cy="40" r="3" fill="currentColor"/><circle cx="60" cy="30" r="2.5" fill="currentColor"/><circle cx="72" cy="60" r="3" fill="currentColor"/><circle cx="40" cy="68" r="2.5" fill="currentColor"/>',
+};
+function decorFor(label = '') {
+  const l = label.toLowerCase();
+  if (l.includes('based') || l.includes('location') || l.includes('live')) return DECOR.ripple;
+  if (l.includes('background') || l.includes('experience') || l.includes('work')) return DECOR.bars;
+  if (l.includes('education') || l.includes('degree') || l.includes('study')) return DECOR.book;
+  if (l.includes('research')) return DECOR.network;
+  if (l.includes('writ') || l.includes('poet')) return DECOR.waves;
+  if (l.includes('goal') || l.includes('aim') || l.includes('mission')) return DECOR.star;
+  return DECOR.constellation;
+}
 ---
 
-<section id="about" class="relative mx-auto max-w-6xl overflow-hidden px-5 py-12">
+<section id="about" class="relative mx-auto max-w-6xl overflow-hidden px-5 pb-14 pt-14">
   <!-- subtle abstract -->
   <div class="pointer-events-none absolute -right-24 top-0 h-72 w-72 rounded-full bg-accent/10 blur-3xl" aria-hidden="true"></div>
   <svg class="pointer-events-none absolute -left-20 bottom-0 h-64 w-64 text-accent/10" viewBox="0 0 200 200" fill="none" aria-hidden="true">
@@ -17,8 +68,8 @@ const { eyebrow, heading, paragraphs, facts } = home.about;
   <div class="relative grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
     <!-- intro -->
     <div>
-      <p class="text-xs font-medium uppercase tracking-[0.2em] text-spark">{eyebrow}</p>
-      <h2 class="mt-3 font-display text-3xl text-accent sm:text-4xl">{heading}</h2>
+      <p class="mb-6 text-xs font-medium uppercase tracking-[0.2em] text-text">{eyebrow}</p>
+      <h2 class="mt-3 font-display text-4xl text-accent sm:text-5xl">{hHead} <span class="text-hollow-thin">{hTail}</span></h2>
       {paragraphs.map((p, i) => (
         <p class:list={['text-pretty leading-relaxed text-muted', i === 0 ? 'mt-6' : 'mt-4']}>{p}</p>
       ))}
@@ -27,9 +78,14 @@ const { eyebrow, heading, paragraphs, facts } = home.about;
     <!-- facts -->
     <dl class="grid gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-2">
       {facts.map((f) => (
-        <div class="bg-surface p-6">
-          <dt class="text-xs font-medium uppercase tracking-[0.15em] text-accent">{f.label}</dt>
-          <dd class="mt-2 text-sm leading-relaxed text-text">{f.value}</dd>
+        <div class="relative overflow-hidden bg-surface p-6">
+          <!-- subtle topic-themed corner motif filling the empty bottom-right -->
+          <svg class="pointer-events-none absolute -bottom-3 -right-3 h-24 w-24 text-accent/15" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={decorFor(f.label)}></svg>
+          <dt class="relative flex items-center gap-2 text-xs font-medium uppercase tracking-[0.15em] text-accent">
+            <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={iconFor(f.label)}></svg>
+            <span>{f.label}</span>
+          </dt>
+          <dd class="relative mt-2 text-sm leading-relaxed text-muted">{f.value}</dd>
         </div>
       ))}
     </dl>

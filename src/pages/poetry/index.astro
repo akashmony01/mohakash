@@ -35,7 +35,6 @@ function preview(body = ''): string[] {
     <SectionHero
       title={pages.poetry.title}
       intro={pages.poetry.intro}
-      tint="#1a8fd6"
       motif="poetry"
     />
 
@@ -56,11 +55,11 @@ function preview(body = ''): string[] {
             </svg>
 
             <div class="relative flex items-baseline justify-between gap-3">
-              <h2 class="font-display text-xl text-text transition-colors group-hover:text-accent">{p.data.title}</h2>
+              <h2 class="font-sans text-xl font-semibold text-text transition-colors group-hover:text-accent">{p.data.title}</h2>
               <span class="shrink-0 text-sm text-muted">{fmt(p.data.date)}</span>
             </div>
 
-            <p class="relative mt-4 flex-1 whitespace-pre-line font-display text-sm italic leading-relaxed text-muted">
+            <p class="relative mt-4 flex-1 whitespace-pre-line font-sans text-sm italic leading-relaxed text-muted">
               {preview(p.body).join('\n')}
             </p>
 

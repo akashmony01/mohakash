@@ -17,7 +17,7 @@ const links = visibleNav(nav.header);
   :class="scrolled ? 'shadow-[0_6px_24px_-8px_rgba(22,25,31,0.45)]' : ''"
   class="sticky top-0 z-50 bg-accent text-white transition-shadow duration-300"
 >
-  <nav class="mx-auto flex max-w-6xl items-center justify-between px-5 py-5">
+  <nav class="mx-auto flex max-w-6xl items-center justify-between px-5 py-6">
     <BrandLogo class="text-white" trigger="load" />
 
     <!-- Desktop nav -->
@@ -27,7 +27,7 @@ const links = visibleNav(nav.header);
           <a
             href={l.href}
             class:list={[
-              'relative text-sm font-semibold text-white transition-colors hover:text-white/65',
+              'relative text-base font-semibold text-white transition-colors hover:text-white/75',
             ]}
           >
             {l.label}
@@ -89,7 +89,7 @@ const links = visibleNav(nav.header);
           <a
             href={l.href}
             @click="open = false"
-            class="block py-3.5 text-base font-semibold text-white transition-colors hover:text-white/65"
+            class="block py-3.5 text-base font-semibold text-white/75 transition-colors hover:text-white"
           >{l.label}</a>
         </li>
       ))}

@@ -47,7 +47,6 @@ const poetry = defineCollection({
   schema: z.object({
     title: z.string(),
     date: z.coerce.date(),
-    note: optionalString,
     hidden: z.boolean().default(false),
   }),
 });

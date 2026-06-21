@@ -1,10 +1,14 @@
 ---
-import '@fontsource-variable/fraunces';
-import '@fontsource-variable/inter';
+// Type system: Anton (display headings) + Space Grotesk (body) + JetBrains Mono
+// (code), with Hind Siliguri (a rounded Bengali sans) carrying the Bangla
+// poetry. Latin fonts lack Bengali glyphs, so the browser falls through to it
+// per-glyph automatically. See the font tokens in global.css.
+import '@fontsource/anton';
+import '@fontsource-variable/space-grotesk';
 import '@fontsource/jetbrains-mono';
-// Bengali serif for the Bangla poetry. Latin fonts above lack Bengali glyphs,
-// so the browser falls through to this for Bengali codepoints automatically.
-import '@fontsource-variable/noto-serif-bengali';
+import '@fontsource/hind-siliguri/400.css';
+import '@fontsource/hind-siliguri/600.css';
+import '@fontsource/hind-siliguri/700.css';
 import '../styles/global.css';
 
 import Starfield from '../components/Starfield.astro';
@@ -182,7 +186,7 @@ const jsonLd = {
       x-cloak
       @click="window.scrollTo({ top: 0, behavior: 'smooth' })"
       aria-label="Back to top"
-      class="fixed bottom-6 right-6 z-50 grid h-10 w-10 place-items-center rounded-full border border-border bg-surface/90 text-text backdrop-blur transition-colors hover:border-accent hover:text-accent"
+      class="fixed bottom-6 right-6 z-50 grid h-10 w-10 cursor-pointer place-items-center rounded-full border border-border bg-surface/90 text-text backdrop-blur transition-colors hover:border-accent hover:text-accent"
     >↑</button>
 
     <!-- Play the footer wordmark animation once when it scrolls into view. -->

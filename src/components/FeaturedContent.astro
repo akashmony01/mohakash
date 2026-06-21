@@ -2,8 +2,14 @@
 import { getCollection } from 'astro:content';
 import home from '../data/home.json';
 import { isSectionVisible } from '../config/sections';
+import { youtubeEmbed } from '../config/youtube';
 
 const { heading: featuredHeading, tagline: featuredTagline } = home.featured;
+
+// Outline the last word of the heading for poster-style emphasis.
+const fhWords = featuredHeading.split(' ');
+const fhTail = fhWords.slice(-1).join(' ');
+const fhHead = fhWords.slice(0, -1).join(' ');
 
 // Relative date label, computed at build time.
 function timeAgo(date: Date): string {
@@ -35,6 +41,9 @@ const projectsAll = isSectionVisible('projects')
 const featuredProject =
   projectsAll.find((p) => p.data.featured) ??
   projectsAll.sort((a, b) => a.data.order - b.data.order)[0];
+const latestVideo = isSectionVisible('videos')
+  ? (await getCollection('videos')).filter((v) => !v.data.hidden).sort(byDate)[0]
+  : undefined;
 
 // First few lines of a poem, joined as a single quoted preview. We take up to 5
 // lines here (the homepage card); the 220-char clip + line-clamp-6 keep it from
@@ -68,6 +77,7 @@ type Card = {
   href: string;
   cta: string;
   quote?: boolean;
+  embed?: string;     // YouTube embed URL — renders an inline player instead of a preview
 };
 
 const cards: Card[] = [];
@@ -93,40 +103,108 @@ if (latestResearch) cards.push({
   title: latestResearch.data.title, meta: timeAgo(latestResearch.data.date),
   preview: latestResearch.data.abstract ?? '', href: `/research/${latestResearch.id}`, cta: 'Read more',
 });
+if (latestVideo) cards.push({
+  // Videos share one /videos page (no per-video route), so the card links there.
+  // The embed lets the visitor play it right in the card.
+  label: 'Latest video', color: 'cat-videos',
+  title: latestVideo.data.title, meta: timeAgo(latestVideo.data.date),
+  preview: latestVideo.data.description ?? '', href: '/videos', cta: 'Watch more',
+  embed: youtubeEmbed(latestVideo.data.youtube) ?? undefined,
+});
 
 const textClass: Record<string, string> = {
   'cat-blog': 'text-cat-blog',
   'cat-poetry': 'text-cat-poetry',
   'cat-projects': 'text-cat-projects',
   'cat-research': 'text-cat-research',
+  'cat-videos': 'text-cat-videos',
 };
+
+// Desktop layout on a 12-column grid: an even split by card count, EXCEPT when
+// the Latest-video card is present (it's always pushed last). Then it never sits
+// alone awkwardly — at 3 cards it gets its own full-width row below a 50/50 pair,
+// and at 4 cards the grid becomes a tidy 2×2. Span per card (12=full, 6=half,
+// 4=third, 3=quarter):
+const hasVideo = cards.some((c) => c.color === 'cat-videos');
+const n = cards.length;
+const spans =
+  n === 1 ? [12] :
+  n === 2 ? [6, 6] :
+  n === 3 ? (hasVideo ? [6, 6, 12] : [4, 4, 4]) :
+  n === 4 ? (hasVideo ? [6, 6, 6, 6] : [3, 3, 3, 3]) :
+  [4, 4, 4, 6, 6];
+const spanClass: Record<number, string> = {
+  3: 'lg:col-span-3',
+  4: 'lg:col-span-4',
+  6: 'lg:col-span-6',
+  12: 'lg:col-span-12',
+};
+
+// The video card (always last) plays an iframe, which makes it taller than a
+// text card. When it sits in a 50/50 row (span 6), the text card beside it — the
+// one right before it — gets a doubled excerpt so it fills the height instead of
+// looking empty. (At span 12 the video has its own full-width row: no neighbor.)
+const videoIdx = cards.findIndex((c) => c.embed);
+const doubleIdx = videoIdx > 0 && spans[videoIdx] === 6 ? videoIdx - 1 : -1;
 ---
 
 {cards.length > 0 && (
-  <section class="mx-auto max-w-6xl px-5 py-16">
+  <section class="mx-auto max-w-6xl px-5 py-14">
     <div class="mb-8 flex items-baseline justify-between">
-      <h2 class="font-display text-3xl text-accent sm:text-4xl">{featuredHeading}</h2>
+      <h2 class="font-display text-4xl text-accent sm:text-5xl">{fhHead} <span class="text-hollow-thin">{fhTail}</span></h2>
       <span class="text-sm text-muted">{featuredTagline}</span>
     </div>
 
-    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {cards.map((c) => (
-        <a
-          href={c.href}
-          class="group flex flex-col rounded-xl border border-t-4 border-border bg-surface p-6 card-cosmic"
-          style={`border-top-color: var(--color-${c.color});`}
-        >
-          <div class="flex items-center justify-between gap-2">
-            <span class={`text-xs font-medium uppercase tracking-wide ${textClass[c.color]}`}>{c.label}</span>
-            <span class="text-xs text-muted">{c.meta}</span>
-          </div>
-          <h3 class="mt-3 font-display text-lg leading-snug text-text">{c.title}</h3>
-          <p class={`mt-2 flex-1 text-sm leading-relaxed text-muted ${c.quote ? 'line-clamp-6 italic' : 'line-clamp-4'}`}>
-            {c.quote ? `“${clip(c.preview, POEM_EXCERPT_MAX)}”` : clip(c.preview)}
-          </p>
-          <span class={`mt-5 text-sm ${textClass[c.color]} transition-transform duration-200 group-hover:translate-x-1`}>{c.cta} →</span>
-        </a>
-      ))}
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-12">
+      {cards.map((c, i) => {
+        // Video card: just a label + a "View more" link top-right, then the player.
+        if (c.embed) {
+          return (
+            <div
+              class:list={['col-span-1 flex flex-col overflow-hidden rounded-xl border border-t-4 border-border bg-surface p-6 card-cosmic', spanClass[spans[i]]]}
+              style={`border-top-color: var(--color-${c.color});`}
+            >
+              <div class="flex items-center justify-between gap-2">
+                <span class={`text-xs font-medium uppercase tracking-wide ${textClass[c.color]}`}>{c.label}</span>
+                <a href={c.href} class={`text-xs font-medium ${textClass[c.color]} transition-transform duration-200 hover:translate-x-0.5`}>View more →</a>
+              </div>
+              <div class="mt-4 aspect-video w-full overflow-hidden rounded-lg border border-border bg-black">
+                <iframe
+                  class="h-full w-full border-0"
+                  src={c.embed}
+                  title={c.title}
+                  loading="lazy"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowfullscreen
+                ></iframe>
+              </div>
+            </div>
+          );
+        }
+        // Double the excerpt for the card sharing a 50/50 row with the video.
+        const isDouble = i === doubleIdx;
+        const max = (c.quote ? POEM_EXCERPT_MAX : EXCERPT_MAX) * (isDouble ? 2 : 1);
+        const clampCls = c.quote
+          ? (isDouble ? 'line-clamp-[12]' : 'line-clamp-6')
+          : (isDouble ? 'line-clamp-[8]' : 'line-clamp-4');
+        return (
+          <a
+            href={c.href}
+            class:list={['group col-span-1 flex flex-col rounded-xl border border-t-4 border-border bg-surface p-6 card-cosmic', spanClass[spans[i]]]}
+            style={`border-top-color: var(--color-${c.color});`}
+          >
+            <div class="flex items-center justify-between gap-2">
+              <span class={`text-xs font-medium uppercase tracking-wide ${textClass[c.color]}`}>{c.label}</span>
+              <span class="text-xs text-muted">{c.meta}</span>
+            </div>
+            <h3 class="mt-4 font-sans text-lg font-semibold leading-snug tracking-tight text-text">{c.title}</h3>
+            <p class:list={['mt-4 flex-1 text-sm leading-relaxed text-muted', clampCls, c.quote && 'italic']}>
+              {c.quote ? `“${clip(c.preview, max)}”` : clip(c.preview, max)}
+            </p>
+            <span class={`mt-5 text-sm ${textClass[c.color]} transition-transform duration-200 group-hover:translate-x-1`}>{c.cta} →</span>
+          </a>
+        );
+      })}
     </div>
   </section>
 )}

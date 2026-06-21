@@ -25,12 +25,12 @@ const videos = visible
       <p class="py-24 text-center text-muted">This section is currently unavailable.</p>
     ) : (
       <>
-        <SectionHero title={ch.title} intro={ch.intro} tint="#1a8fd6" motif="videos" />
+        <SectionHero title={ch.title} intro={ch.intro} motif="videos" />
 
         <!-- Channel info bar -->
         <div class="mb-10 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border bg-surface px-5 py-4">
           <div>
-            <p class="font-display text-lg text-text">{ch.channelName}</p>
+            <p class="font-sans text-lg font-semibold text-text">{ch.channelName}</p>
             {ch.handle && <p class="text-sm text-muted">{ch.handle}</p>}
           </div>
           <div class="flex flex-wrap gap-3 text-sm">
@@ -54,11 +54,10 @@ const videos = visible
                   {embed ? (
                     <div class="aspect-video w-full overflow-hidden rounded-xl border border-border bg-black">
                       <iframe
-                        class="h-full w-full"
+                        class="h-full w-full border-0"
                         src={embed}
                         title={v.data.title}
                         loading="lazy"
-                        frameborder="0"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                         allowfullscreen
                       ></iframe>
@@ -68,7 +67,7 @@ const videos = visible
                       Invalid YouTube link — check this video's “youtube” field.
                     </div>
                   )}
-                  <h2 class="mt-3 font-display text-lg text-text">{v.data.title}</h2>
+                  <h2 class="mt-3 font-sans text-lg font-semibold text-text">{v.data.title}</h2>
                   {v.data.description && (
                     <p class="mt-1 text-sm leading-relaxed text-muted">{v.data.description}</p>
                   )}
