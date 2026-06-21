@@ -42,6 +42,11 @@
   font-family: var(--font-sans);
   font-weight: 500;
 }
+/* "akash" sits heavier than "mohammed" — 700 is Space Grotesk's max weight
+   (it has no true 900 "black"). */
+.brand-logo .logo-akash {
+  font-weight: 700;
+}
 
 /* Hollow / outlined display text — transparent fill with a stroked edge, for
    poster-style emphasis on large headings (use on big text only; it reads
