@@ -1,29 +1,26 @@
 ---
 /*
-  Distinct-but-cohesive hero banner for each section.
-  - A soft tinted glow + a faint celestial motif give each section its own
-    identity while staying within the night-sky palette.
-  - Pass `image` to use a real background photo later (dark overlay applied).
+  Distinct-but-cohesive hero banner for each section. A soft tinted glow + a
+  faint celestial motif give each section its own identity while staying within
+  the palette.
 */
 interface Props {
   title: string;
   intro: string;
-  tint?: string;                                  // glow color
+  tint?: string;                                  // glow color (defaults to sky-blue)
   motif?: 'poetry' | 'research' | 'projects' | 'blog' | 'videos';
-  image?: string;                                 // optional bg photo
 }
 
-const { title, intro, tint = '#00d9ff', motif, image } = Astro.props;
+const { title, intro, tint = '#1a8fd6', motif } = Astro.props;
+
+// Outline the last word of the title for poster-style emphasis (matches the
+// homepage section headings). Single-word titles stay fully solid.
+const tWords = title.trim().split(/\s+/);
+const tTail = tWords.length > 1 ? tWords.slice(-1).join(' ') : '';
+const tHead = tWords.length > 1 ? tWords.slice(0, -1).join(' ') : title;
 ---
 
 <header class="relative mb-12 overflow-hidden rounded-2xl border border-border bg-surface px-6 py-12 shadow-[0_6px_24px_rgba(43,47,58,0.05)] sm:px-10 sm:py-16">
-  {image && (
-    <>
-      <img src={image} alt="" aria-hidden="true" class="absolute inset-0 h-full w-full object-cover opacity-30 [filter:grayscale(0.5)]" />
-      <div class="absolute inset-0 bg-gradient-to-r from-bg via-bg/80 to-bg/40"></div>
-    </>
-  )}
-
   <!-- tinted glow -->
   <div
     class="pointer-events-none absolute -left-16 -top-20 h-64 w-64 rounded-full blur-3xl"
@@ -101,7 +98,7 @@ const { title, intro, tint = '#00d9ff', motif, image } = Astro.props;
   </svg>
 
   <div class="relative max-w-2xl">
-    <h1 class="text-4xl text-accent sm:text-5xl">{title}</h1>
+    <h1 class="text-4xl text-accent sm:text-5xl">{tHead} {tTail && <span class="text-hollow-thin">{tTail}</span>}</h1>
     <p class="mt-5 text-lg text-muted">{intro}</p>
   </div>
 </header>

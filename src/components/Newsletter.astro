@@ -7,6 +7,11 @@ import home from '../data/home.json';
 
 const endpoint = import.meta.env.PUBLIC_NEWSLETTER_ENDPOINT ?? '';
 const { badge, heading, subtext } = home.newsletter;
+
+// Outline the last two words of the heading for poster-style emphasis.
+const hWords = heading.split(' ');
+const hTail = hWords.slice(-2).join(' ');
+const hHead = hWords.slice(0, -2).join(' ');
 ---
 
 <section class="mx-auto max-w-6xl px-5 py-12">
@@ -27,12 +32,12 @@ const { badge, heading, subtext } = home.newsletter;
       </g>
     </svg>
 
-    <span class="relative inline-flex items-center gap-2 rounded-full bg-accent/10 px-4 py-1 text-xs font-medium uppercase tracking-[0.18em] text-accent ring-1 ring-accent/25">
+    <span class="relative inline-flex items-center gap-2 rounded-full bg-accent/10 px-4 py-1 text-xs font-medium uppercase tracking-[0.18em] text-text ring-1 ring-accent/25">
       <svg width="12" height="12" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M16 4 L17.8 14.2 L28 16 L17.8 17.8 L16 28 L14.2 17.8 L4 16 L14.2 14.2 Z" /></svg>
       {badge}
     </span>
-    <h2 class="relative mx-auto mt-5 max-w-2xl font-display text-3xl leading-tight text-accent sm:text-4xl">
-      {heading}
+    <h2 class="relative mx-auto mt-5 max-w-2xl font-display text-4xl leading-tight text-accent sm:text-5xl">
+      {hHead} <span class="text-hollow-thin">{hTail}</span>
     </h2>
     <p class="relative mx-auto mt-4 max-w-xl text-muted">
       {subtext}

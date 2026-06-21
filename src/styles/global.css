@@ -25,10 +25,40 @@
   --color-cat-poetry: #b14a86;  /* magenta */
   --color-cat-research: #1d9e75;/* teal    */
   --color-cat-blog: #d4683a;    /* coral   */
+  --color-cat-videos: #7c5cd0;  /* violet  */
 
-  --font-display: "Fraunces Variable", "Noto Serif Bengali Variable", Georgia, "Times New Roman", serif;
-  --font-sans: "Inter Variable", "Noto Serif Bengali Variable", system-ui, -apple-system, sans-serif;
+  /* Type system: Anton for big display headings, Space Grotesk for body, with
+     Hind Siliguri carrying Bengali (Latin fonts lack Bengali glyphs, so the
+     browser falls through per-glyph). JetBrains Mono for code. */
+  --font-display: "Anton", "Hind Siliguri", Impact, sans-serif;
+  --font-sans: "Space Grotesk Variable", "Hind Siliguri", system-ui, -apple-system, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+/* Wordmark in the body typeface (Space Grotesk), at a medium weight so the
+   stacked caps read as a deliberate logo. Per-line tracking from the markup is
+   left intact so "Mohammed / Akash" keeps its even-rectangle alignment. */
+.brand-logo span {
+  font-family: var(--font-sans);
+  font-weight: 500;
+}
+
+/* Hollow / outlined display text — transparent fill with a stroked edge, for
+   poster-style emphasis on large headings (use on big text only; it reads
+   poorly small). On-palette: the stroke uses the sky-blue accent, so it stays
+   visible in both light and dark mode. `.text-hollow` is thick for the giant
+   hero; `.text-hollow-thin` is for the smaller section headings, where a 2px
+   stroke looks too heavy relative to the letter size. */
+.text-hollow,
+.text-hollow-thin {
+  color: transparent;
+  paint-order: stroke fill;
+}
+.text-hollow { -webkit-text-stroke: 2px var(--color-accent); }
+.text-hollow-thin { -webkit-text-stroke: 1px var(--color-accent); }
+@media (max-width: 640px) {
+  .text-hollow { -webkit-text-stroke-width: 1.4px; }
+  .text-hollow-thin { -webkit-text-stroke-width: 0.8px; }
 }
 
 /* Dark theme — toggled by adding `.dark` to <html>. Only the neutral tokens
@@ -50,6 +80,10 @@ html.dark {
   html {
     color-scheme: light;
     scroll-behavior: smooth;
+    /* Offset in-page anchor jumps (#about, #contact, …) so the target section
+       lands below the sticky header (~70px) with a little breathing room,
+       instead of hiding under it. */
+    scroll-padding-top: 6rem;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -65,10 +99,10 @@ html.dark {
   }
 
   h1, h2, h3, h4 {
-    font-family: var(--font-display);
-    font-weight: 500;
-    letter-spacing: -0.01em;
-    color: var(--color-accent);   /* bright sky-blue headings */
+    font-family: var(--font-display);   /* Anton — single weight (400) */
+    font-weight: 400;
+    letter-spacing: 0.01em;             /* Anton is condensed; relax tracking */
+    color: var(--color-accent);         /* bright sky-blue headings */
   }
 
   ::selection {
@@ -170,8 +204,10 @@ html.dark {
     line-height: 1.75;
     font-size: 1.0625rem;
   }
-  .prose-sky h2 { font-size: 1.5rem; margin-top: 2em; margin-bottom: 0.5em; }
-  .prose-sky h3 { font-size: 1.25rem; margin-top: 1.5em; margin-bottom: 0.4em; }
+  /* Article-body subheadings use Space Grotesk semibold (not the heavy Anton
+     display face) so long-form reading stays comfortable. */
+  .prose-sky h2 { font-family: var(--font-sans); font-weight: 600; font-size: 1.5rem; margin-top: 2em; margin-bottom: 0.5em; }
+  .prose-sky h3 { font-family: var(--font-sans); font-weight: 600; font-size: 1.25rem; margin-top: 1.5em; margin-bottom: 0.4em; }
   .prose-sky p { margin-bottom: 1.15em; }
   /* Style real content links, but leave .btn buttons alone — otherwise these
      higher-specificity rules force button text blue (blue-on-blue in the filled

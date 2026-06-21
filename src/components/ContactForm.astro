@@ -13,18 +13,23 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? '';
 
 // Copy is CMS-editable (src/data/home.json → "Home page" → Contact).
 const { eyebrow, heading, intro, openTo } = home.contact;
+
+// Outline the last two words of the heading for poster-style emphasis.
+const hWords = heading.split(' ');
+const hTail = hWords.slice(-2).join(' ');
+const hHead = hWords.slice(0, -2).join(' ');
 ---
 
-<section id="contact" class="mx-auto max-w-6xl px-5 py-20 scroll-mt-24">
-  <div class="rounded-2xl border border-border bg-surface p-8 shadow-[0_6px_24px_rgba(43,47,58,0.05)] sm:p-12">
-    <div class="grid gap-10 sm:grid-cols-2 sm:gap-14">
+<section id="contact" class="mx-auto max-w-6xl px-5 pt-14 pb-4">
+  <div class="rounded-2xl border border-border bg-surface px-6 py-12 sm:px-12 sm:py-16 shadow-[0_6px_24px_rgba(43,47,58,0.05)]">
+    <div class="relative grid gap-10 sm:grid-cols-2 sm:gap-14">
       <!-- Invitation -->
       <div class="relative flex flex-col">
-        <p class="text-xs uppercase tracking-[0.2em] text-spark">{eyebrow}</p>
-        <h2 class="mt-3 font-display text-3xl leading-tight text-accent sm:text-4xl">
-          {heading}
+        <p class="text-xs uppercase tracking-[0.2em] text-text">{eyebrow}</p>
+        <h2 class="mt-6 font-display text-4xl leading-tight text-accent sm:text-5xl">
+          {hHead} <span class="text-hollow-thin">{hTail}</span>
         </h2>
-        <p class="mt-4 text-muted">
+        <p class="mt-6 text-muted">
           {intro}
         </p>
 
@@ -53,23 +58,6 @@ const { eyebrow, heading, intro, openTo } = home.contact;
             ))}
           </ul>
         </div>
-
-        <!-- small constellation art -->
-        <svg class="mt-8 hidden h-20 w-40 opacity-25 sm:block" viewBox="0 0 160 96" fill="none" aria-hidden="true" style="color: var(--color-accent);">
-          <g stroke="currentColor" stroke-width="1">
-            <line x1="10" y1="70" x2="45" y2="40" />
-            <line x1="45" y1="40" x2="85" y2="55" />
-            <line x1="85" y1="55" x2="120" y2="25" />
-            <line x1="120" y1="25" x2="150" y2="45" />
-          </g>
-          <g fill="currentColor">
-            <circle cx="10" cy="70" r="2.5" />
-            <circle cx="45" cy="40" r="3" />
-            <circle cx="85" cy="55" r="2.5" />
-            <circle cx="120" cy="25" r="3" />
-            <circle cx="150" cy="45" r="2" />
-          </g>
-        </svg>
       </div>
 
       <!-- Form -->
@@ -160,6 +148,23 @@ const { eyebrow, heading, intro, openTo } = home.contact;
           </button>
         </div>
       </form>
+
+      <!-- small constellation art -->
+      <svg class="absolute -bottom-8 -right-5 hidden h-20 w-40 opacity-25 sm:block" viewBox="0 0 160 96" fill="none" aria-hidden="true" style="color: var(--color-accent);">
+        <g stroke="currentColor" stroke-width="1">
+          <line x1="10" y1="70" x2="45" y2="40" />
+          <line x1="45" y1="40" x2="85" y2="55" />
+          <line x1="85" y1="55" x2="120" y2="25" />
+          <line x1="120" y1="25" x2="150" y2="45" />
+        </g>
+        <g fill="currentColor">
+          <circle cx="10" cy="70" r="2.5" />
+          <circle cx="45" cy="40" r="3" />
+          <circle cx="85" cy="55" r="2.5" />
+          <circle cx="120" cy="25" r="3" />
+          <circle cx="150" cy="45" r="2" />
+        </g>
+      </svg>
     </div>
   </div>
 </section>

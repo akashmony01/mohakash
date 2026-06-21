@@ -25,7 +25,6 @@ const projects = visible
     <SectionHero
       title={pages.projects.title}
       intro={pages.projects.intro}
-      tint="#1a8fd6"
       motif="projects"
     />
 
@@ -39,7 +38,7 @@ const projects = visible
             class="group flex flex-col rounded-xl border border-border bg-surface p-8 card-cosmic hover:border-accent/50"
           >
             <div class="flex items-baseline justify-between gap-3">
-              <h2 class="font-display text-xl text-text">{p.data.title}</h2>
+              <h2 class="font-sans text-xl font-semibold text-text">{p.data.title}</h2>
               {p.data.year && <span class="text-sm text-muted">{p.data.year}</span>}
             </div>
             <p class="mt-2 flex-1 text-sm leading-relaxed text-muted">{p.data.summary}</p>

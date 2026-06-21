@@ -64,7 +64,6 @@ collections:
     fields:
       - { label: Title, name: title, widget: string }
       - { label: Date, name: date, widget: datetime, date_format: "YYYY-MM-DD", time_format: false, picker_utc: true }
-      - { label: Note, name: note, widget: text, required: false }
       - { label: "Hidden (keep file, hide from site)", name: hidden, widget: boolean, default: false }
       - { label: Body, name: body, widget: markdown }
 
@@ -150,7 +149,6 @@ collections:
       - { label: Description, name: description, widget: text, required: false }
       - { label: Order, name: order, widget: number, default: 0, value_type: int }
       - { label: "Hidden (keep file, hide from site)", name: hidden, widget: boolean, default: false }
-      - { label: Notes, name: body, widget: markdown, required: false }
 
   # ---- Site settings (the editable JSON data files) -------------------------
   - name: settings
@@ -211,7 +209,6 @@ collections:
             fields:
               - { label: Eyebrow, name: eyebrow, widget: string }
               - { label: Name, name: name, widget: string }
-              - { label: Tagline, name: tagline, widget: string }
               - { label: Intro, name: intro, widget: text }
               - { label: CTA label, name: ctaLabel, widget: string }
           - label: Newsletter

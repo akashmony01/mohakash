@@ -22,10 +22,10 @@ rather than four stitched-together sites.
 *Mohakash* — **moh** for Mohammed, **akash** for Akash — also means *the infinite
 sky*. That gave the whole thing a spine. The site reads like an open daytime sky:
 a light, warm off-white canvas, a faint starfield, sky-blue accents over charcoal
-text, serif headlines (Fraunces) above a clean sans body (Inter). A dark "night
-sky" mode is one click away and remembers your choice. Bengali poetry renders in
-a proper Bengali serif, so the 55 poems don't fall back to a mismatched system
-font.
+text, bold display headlines (Anton) above a clean grotesk body (Space Grotesk).
+A dark "night sky" mode is one click away and remembers your choice. Bengali
+poetry renders in a rounded Bengali sans (Hind Siliguri), so the 55 poems don't
+fall back to a mismatched system font.
 
 ## Decisions I'd defend
 
