@@ -1,8 +1,8 @@
 ---
-title: "Building with Claude: Finding Passive Income Without Losing Myself"
+title: 'Building with Claude: Finding Passive Income Without Losing Myself'
 date: 2026-06-20
-category: "Building with Claude"
-excerpt: "A long, honest conversation with Claude about passive income, identity, and what's actually realistic on an $800/month salary in Bangladesh — plus the simple prompt system we built to turn any workday into a blog post."
+category: Building with Claude
+excerpt: A long, honest conversation with Claude about passive income, identity, and what's actually realistic on an $800/month salary in Bangladesh — plus the simple prompt system we built to turn any workday into a blog post.
 ---
 
 ## The problem I started with
@@ -24,7 +24,7 @@ So I asked Claude: **"What actually works for my specific situation?"**
 What followed was one of the most honest conversations I've had about money,
 identity, and what's actually realistic.
 
----
+***
 
 ## What I got wrong (the journey)
 
@@ -89,7 +89,7 @@ dev income to fund poet + researcher work."
 
 Dev is the vehicle, not the cage.
 
----
+***
 
 ## What Claude got wrong
 
@@ -127,7 +127,7 @@ All of this would have made Claude's advice better from the start.
 
 **Lesson:** Better questions earlier = better answers.
 
----
+***
 
 ## What we actually solved
 
@@ -137,15 +137,17 @@ By the end of the conversation, I had:
 2. **A sequenced path:** Newsletter + digital products + poetry (not everything
    at once).
 3. **A time-bound plan:**
-   - Months 1–3: Write 2–3 posts/week, build the newsletter (3–4 hrs/day).
-   - Months 4–6: First sponsor inquiries, product launches.
-   - Month 6+: Sustainable $300–500/month passive.
+
+- Months 1–3: Write 2–3 posts/week, build the newsletter (3–4 hrs/day).
+- Months 4–6: First sponsor inquiries, product launches.
+- Month 6+: Sustainable $300–500/month passive.
+
 4. **Reusable prompts:** To turn any day's work into blog posts.
 5. **Permission to keep my job:** It's security, not a cage.
 6. **Understanding my actual edge:** Dev + poet + researcher is rare, not
    limiting.
 
----
+***
 
 ## The real insight
 
@@ -161,7 +163,7 @@ interests?"
 
 Different question. Better answer.
 
----
+***
 
 ## The system we built
 
@@ -174,13 +176,13 @@ publishable content.
 2. End-of-day markdown post (publish to the blog)
 3. Social posts from the blog (create later)
 
-Takes ~20 minutes/day. Turns work into content. Content builds audience. Audience
+Takes \~20 minutes/day. Turns work into content. Content builds audience. Audience
 → sponsors.
 
 And importantly: **the blog post stays forever.** Social posts come and go. But
 the blog post becomes SEO, becomes reference, becomes portfolio.
 
----
+***
 
 ## What happens next
 
@@ -201,7 +203,7 @@ In 6 months:
 
 And I didn't have to choose between code and poetry. I just had to sequence them.
 
----
+***
 
 ## The prompts (copy-paste ready)
 
@@ -212,17 +214,24 @@ Use this 2–3× throughout your workday when you finish something:
 ```text
 REFLECTION CHECKPOINT
 
-We just finished working on something. Reflect on what we accomplished:
+We just finished working on something.
 
-- What problem were we solving?
-- What approach did you suggest?
-- What did I get wrong or assume incorrectly?
-- What did you get wrong or suggest poorly?
-- What's the core lesson we learned?
+Please help me reflect on this work:
 
-Write this as a blog section (200-300 words, conversational tone).
-Make it honest about mistakes.
-Include a code snippet if relevant.
+1. What category of problem did we solve? (be general: "form validation", "API integration", etc.)
+2. What approach did I suggest and WHY did I suggest it?
+3. What did I get wrong or assume incorrectly?
+4. What did you get wrong or suggest poorly?
+5. What's the core lesson we learned?
+
+Write your reflection as a detailed section (400-600 words).
+Be conversational and honest about mistakes.
+Explain the HOW and WHY, not just the WHAT.
+Include code snippets if relevant (but generalized).
+Show the actual thinking process.
+
+IMPORTANT: Don't mention any client names, company details, site names, or identifying information.
+Keep everything generalized and broadly applicable.
 ```
 
 ### Prompt 2: New day start (optional)
@@ -230,14 +239,18 @@ Include a code snippet if relevant.
 Use this at the start of your workday if you want:
 
 ```text
-NEW WORK DAY STARTING
-Date: [TODAY'S DATE]
+I'm starting a new work day today.
 
-I'm starting a new work day. Throughout the day I'll ask you to reflect on
-what we accomplish. At the end of the day, I'll ask you to compile it into a
-blog post.
+Throughout the day I'll ask you to reflect on what we accomplish.
 
-Ready to start.
+Key principles for today:
+- Focus on METHODOLOGY, not project specifics
+- Generalize all details (never mention client names, site names, company details)
+- Document the PROCESS and LEARNING, not the project
+- Be detailed about HOW and WHY
+- Be honest about mistakes and confusion
+
+Acknowledge you understand these guidelines.
 ```
 
 ### Prompt 3: End-of-day — create markdown
@@ -245,28 +258,90 @@ Ready to start.
 Use this at the end of work to create your blog post:
 
 ```text
-CREATE MARKDOWN BLOG POST FROM TODAY'S WORK
+CREATE BLOG POST AND SAVE TO FILE
 
-Here are the reflection sections from today's work:
-[PASTE ALL SECTIONS HERE]
+I'm giving you my work reflections from today. Create a complete blog post and save it as a markdown file.
 
-Combine them into ONE markdown blog post with this structure:
+REFLECTIONS FROM TODAY:
+[PASTE YOUR REFLECTION SECTIONS HERE]
 
-title: Building with Claude, [DATE]: [Main Insight]
-date: [DATE]
+---
 
-[Intro paragraph - 2-3 sentences about the day]
-[Combine all reflection sections naturally]
+INSTRUCTIONS:
 
-Key Lessons Learned
-[Synthesize all lessons into 3-4 actionable insights]
+Create a markdown blog post with this exact structure:
 
-Output ONLY the markdown.
-Conversational tone.
-Be honest about failures/mistakes.
-Include code snippets if relevant.
-1000-1500 words.
-Ready to copy/paste to your site.
+---
+title: Building with Claude, [Today's Date]: [Main Insight from your work]
+date: [Today's Date in YYYY-MM-DD format]
+---
+
+## Opening Hook
+2-3 sentences introducing the problem category (generalized, no project details).
+
+## The Problem We Were Solving
+Explain what kind of problem this was and why it matters.
+Generalized language only - no client/company/site names.
+
+## What I Tried First (The Approach)
+Detailed explanation of your initial thinking.
+Why you chose this approach.
+Your mental model and assumptions.
+Include relevant code snippets (generalized).
+
+## What I Got Wrong
+Specific details about your mistake.
+Explain the false assumption.
+Why you believed it at the time.
+What changed your mind.
+Use phrases like: "I assumed...", "I thought...", "I didn't consider..."
+
+## What Claude Got Wrong
+Specific details about my mistake.
+Why the approach seemed plausible but was wrong.
+What data I was missing.
+How this derailed the investigation.
+
+## What We Actually Solved
+Detailed explanation of the real solution.
+Why it worked.
+How it differed from the initial approach.
+The thinking process that led to it.
+Include code if relevant (generalized, safe to share).
+
+## Key Lessons Learned
+3-5 actionable insights that apply broadly, not just to this project.
+Explain the WHY behind each lesson.
+Show how these lessons apply beyond this specific work.
+
+---
+
+CRITICAL REQUIREMENTS:
+- 1200-1800 words total
+- Conversational tone
+- Detailed HOW and WHY explanations
+- Honest about confusion and mistakes
+- Show the actual problem-solving journey
+- NO client names, company details, site URLs
+- NO identifying business information
+- Code examples are generic and safe to share
+- Focus on METHODOLOGY and LEARNING
+
+---
+
+FILE SAVING:
+Save this as a markdown file with the filename: building-with-claude-[TODAY'S-DATE]-[SHORT-TITLE].md
+
+Examples:
+- building-with-claude-2026-06-25-form-validation.md
+- building-with-claude-2026-06-26-api-integration.md
+
+Use YYYY-MM-DD format for date. Use 1-3 word title, lowercase, hyphens only.
+
+Output the complete markdown content, ready to save.
+Include the frontmatter (title and date).
+No additional text before or after.
+The file should be ready to copy directly to the blog folder.
 ```
 
 ### Prompt 4: Create social posts (use later)
@@ -274,29 +349,99 @@ Ready to copy/paste to your site.
 Use this AFTER publishing to create social content:
 
 ```text
-CREATE SOCIAL POSTS FROM BLOG POST
+CREATE SOCIAL POSTS AND SAVE TO FILE
 
-Here's my blog post:
-[PASTE YOUR PUBLISHED BLOG POST]
+I'm giving you my published blog post. Create social media posts and save them as a markdown file.
 
-Create:
-
-TWITTER THREAD (5 tweets):
-- Tweet 1: [Hook with main insight]
-- Tweet 2: [What I got wrong]
-- Tweet 3: [What Claude got wrong]
-- Tweet 4: [Lesson learned]
-- Tweet 5: [CTA - "Read full post: [LINK]"]
-
-LINKEDIN POST (200-300 words):
-- [Professional summary]
-- [Main insights]
-- [CTA - "Full post: [LINK]"]
-
-Make them quotable and shareable.
-```
+MY BLOG POST:
+[PASTE YOUR PUBLISHED BLOG POST HERE]
 
 ---
+
+INSTRUCTIONS:
+
+Create social posts in markdown format and save as a file.
+
+Format the output like this:
+
+---
+title: Social Posts - [Blog Post Title]
+date: [Today's Date]
+---
+
+## Twitter Thread
+
+Tweet 1:
+[Opening hook about the insight, not the project details]
+
+Tweet 2:
+[What you got wrong - the learning]
+
+Tweet 3:
+[What Claude got wrong - the mistake]
+
+Tweet 4:
+[The actual solution - the methodology]
+
+Tweet 5:
+[Key lesson 1 - broadly applicable]
+
+Tweet 6:
+[Key lesson 2 - broadly applicable]
+
+Tweet 7:
+[CTA with blog link]
+
+---
+
+## LinkedIn Post
+
+[200-300 word professional summary]
+[Focus on methodology and learning]
+[Why this matters for developers/builders]
+[Generalized language throughout]
+[Include blog link]
+
+---
+
+## Reddit Post (Optional)
+
+[Story format - what happened, what you learned]
+[Conversational tone]
+[Humble and honest]
+[Generalized, no client info]
+[Link to full post]
+
+---
+
+TONE REQUIREMENTS:
+- Honest about mistakes
+- Focus on methodology and learning
+- Broadly applicable (not project-specific)
+- Invites critical thinking
+- Safe to share publicly (no client exposure)
+- Quotable tweets
+- Engaging LinkedIn post
+- Conversational Reddit post
+
+---
+
+FILE SAVING:
+Save this as a markdown file with the filename: social-posts-[TODAY'S-DATE]-[BLOG-TITLE].md
+
+Examples:
+- social-posts-2026-06-25-form-validation.md
+- social-posts-2026-06-26-api-integration.md
+
+Use YYYY-MM-DD format for date.
+
+Output the complete markdown content, ready to save.
+Include the frontmatter (title and date).
+No additional text before or after.
+The file should be ready to copy directly to your notes or posting system.
+```
+
+***
 
 ## The meta realization
 
@@ -317,9 +462,9 @@ One conversation. One blog post. Infinite uses.
 
 That's the whole thing.
 
----
+***
 
-*This post was created by reflecting on a day-long conversation with Claude about
+\*This post was created by reflecting on a day-long conversation with Claude about
 building passive income, finding identity as a developer + poet + researcher, and
 creating a sustainable content system. It's the first real test of the prompt
-system described above.*
+system described above.\*
