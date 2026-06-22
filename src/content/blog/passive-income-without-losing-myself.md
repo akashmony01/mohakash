@@ -258,21 +258,25 @@ Acknowledge you understand these guidelines.
 Use this at the end of work to create your blog post:
 
 ```text
-CREATE BLOG POST AND SAVE TO FILE
+CREATE BLOG POST FROM TODAY'S WORK
 
-I'm giving you my work reflections from today. Create a complete blog post and save it as a markdown file.
+Look through our entire conversation history from today.
 
-REFLECTIONS FROM TODAY:
-[PASTE YOUR REFLECTION SECTIONS HERE]
+IF reflection sections exist:
+- Use those reflections to create the blog post
+- Combine all reflections into one coherent narrative
+
+IF NO reflection sections exist:
+- Analyze our conversation naturally
+- Extract the topics, problems, solutions, and lessons from what we discussed
+- Figure out what we worked on, what went wrong, what went right
+- Come up with the main themes and insights yourself
+- Don't ask me for anything - just create the blog post from the conversation
+
+Either way, create a markdown blog post:
 
 ---
-
-INSTRUCTIONS:
-
-Create a markdown blog post with this exact structure:
-
----
-title: Building with Claude, [Today's Date]: [Main Insight from your work]
+title: Building with Claude, [Today's Date]: [Main Insight]
 date: [Today's Date in YYYY-MM-DD format]
 ---
 
@@ -284,22 +288,21 @@ Explain what kind of problem this was and why it matters.
 Generalized language only - no client/company/site names.
 
 ## What I Tried First (The Approach)
-Detailed explanation of your initial thinking.
-Why you chose this approach.
-Your mental model and assumptions.
+Detailed explanation of the initial thinking.
+Why this approach was chosen.
+Mental model and assumptions.
 Include relevant code snippets (generalized).
 
 ## What I Got Wrong
-Specific details about your mistake.
+Specific details about the mistake.
 Explain the false assumption.
-Why you believed it at the time.
-What changed your mind.
-Use phrases like: "I assumed...", "I thought...", "I didn't consider..."
+Why it was believed at the time.
+What changed the perspective.
 
 ## What Claude Got Wrong
 Specific details about my mistake.
 Why the approach seemed plausible but was wrong.
-What data I was missing.
+What data was missing.
 How this derailed the investigation.
 
 ## What We Actually Solved
@@ -310,7 +313,7 @@ The thinking process that led to it.
 Include code if relevant (generalized, safe to share).
 
 ## Key Lessons Learned
-3-5 actionable insights that apply broadly, not just to this project.
+3-5 actionable insights that apply broadly.
 Explain the WHY behind each lesson.
 Show how these lessons apply beyond this specific work.
 
@@ -331,10 +334,6 @@ CRITICAL REQUIREMENTS:
 
 FILE SAVING:
 Save this as a markdown file with the filename: building-with-claude-[TODAY'S-DATE]-[SHORT-TITLE].md
-
-Examples:
-- building-with-claude-2026-06-25-form-validation.md
-- building-with-claude-2026-06-26-api-integration.md
 
 Use YYYY-MM-DD format for date. Use 1-3 word title, lowercase, hyphens only.
 
