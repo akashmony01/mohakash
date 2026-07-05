@@ -6,6 +6,7 @@ excerpt: "I spent today turning a pile of hardcoded UI into something a non-tech
 draft: false
 hidden: false
 cover: ''
+featured: true
 resources: []
 ---
 

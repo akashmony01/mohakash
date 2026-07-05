@@ -1,0 +1,33 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import FeaturedTag from '../FeaturedTag.astro';
+
+interface Props {
+  items: CollectionEntry<'research'>[];
+  featured?: boolean;
+}
+const { items, featured = false } = Astro.props;
+const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+---
+
+<ul class={featured ? 'space-y-4' : 'space-y-6'}>
+  {items.map((e) => (
+    <li
+      class:list={[
+        featured
+          ? 'relative rounded-xl border border-border bg-surface p-6 pb-10 card-cosmic'
+          : 'border-b border-border pb-6',
+      ]}
+    >
+      <a href={`/research/${e.id}`} class="group block">
+        <div class="flex items-center gap-3">
+          <span class="rounded-full border border-border px-2.5 py-0.5 text-xs uppercase tracking-wide text-spark">{e.data.type}</span>
+          <span class="text-sm text-muted">{fmt(e.data.date)}</span>
+        </div>
+        <h2 class="mt-2 font-sans text-xl font-semibold text-text transition-colors group-hover:text-accent">{e.data.title}</h2>
+        {e.data.abstract && <p class="mt-2 text-sm leading-relaxed text-muted">{e.data.abstract}</p>}
+      </a>
+      {featured && <FeaturedTag />}
+    </li>
+  ))}
+</ul>

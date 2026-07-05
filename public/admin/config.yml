@@ -36,6 +36,7 @@ collections:
       - { label: Date, name: date, widget: datetime, date_format: "YYYY-MM-DD", time_format: false, picker_utc: true }
       - { label: Category, name: category, widget: select, options: ["Building with Claude", "Notes", "Dev"], default: "Notes" }
       - { label: Excerpt, name: excerpt, widget: text }
+      - { label: "Featured (pin to top of listing)", name: featured, widget: boolean, default: false }
       - { label: Draft, name: draft, widget: boolean, default: false }
       - { label: "Hidden (keep file, hide from site)", name: hidden, widget: boolean, default: false }
       - { label: Cover image, name: cover, widget: image, required: false }
@@ -64,6 +65,7 @@ collections:
     fields:
       - { label: Title, name: title, widget: string }
       - { label: Date, name: date, widget: datetime, date_format: "YYYY-MM-DD", time_format: false, picker_utc: true }
+      - { label: "Featured (pin to top of listing)", name: featured, widget: boolean, default: false }
       - { label: "Hidden (keep file, hide from site)", name: hidden, widget: boolean, default: false }
       - { label: Body, name: body, widget: markdown }
 
@@ -85,6 +87,7 @@ collections:
       - { label: Abstract, name: abstract, widget: text, required: false }
       - { label: PDF path, name: pdf, widget: string, required: false }
       - { label: Link, name: link, widget: string, required: false }
+      - { label: "Featured (pin to top of listing)", name: featured, widget: boolean, default: false }
       - { label: "Hidden (keep file, hide from site)", name: hidden, widget: boolean, default: false }
       - { label: Cover image, name: cover, widget: image, required: false }
       - label: Resources
@@ -148,6 +151,7 @@ collections:
       - { label: "YouTube link or video ID", name: youtube, widget: string, hint: "Paste the full YouTube URL (or just the 11-character video ID)." }
       - { label: Description, name: description, widget: text, required: false }
       - { label: Order, name: order, widget: number, default: 0, value_type: int }
+      - { label: "Featured (pin to top of listing)", name: featured, widget: boolean, default: false }
       - { label: "Hidden (keep file, hide from site)", name: hidden, widget: boolean, default: false }
 
   # ---- Site settings (the editable JSON data files) -------------------------
@@ -164,6 +168,7 @@ collections:
           - { label: Default theme, name: defaultTheme, widget: select, options: [light, dark], default: light }
           - { label: Site title (SEO), name: siteTitle, widget: string }
           - { label: Site description (SEO), name: siteDescription, widget: text }
+          - { label: "Posts per page (listing pagination)", name: postsPerPage, widget: number, default: 9, value_type: int, min: 1, max: 48 }
           - { label: Portrait (light), name: portraitLight, widget: image }
           - { label: Portrait (dark), name: portraitDark, widget: image }
       - name: social

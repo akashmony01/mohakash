@@ -1,0 +1,37 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SectionHero from '../../../components/SectionHero.astro';
+import VideosList from '../../../components/lists/VideosList.astro';
+import Pagination from '../../../components/Pagination.astro';
+import pages from '../../../data/pages.json';
+import { isSectionVisible } from '../../../config/sections';
+import { paginate, extraPageNumbers } from '../../../config/pagination';
+import { byVideoOrder } from '../../../config/sort';
+
+export async function getStaticPaths() {
+  if (!isSectionVisible('videos')) return [];
+  const rest = (await getCollection('videos'))
+    .filter((v) => !v.data.hidden && !v.data.featured)
+    .sort(byVideoOrder);
+  return extraPageNumbers(rest.length).map((p) => ({ params: { page: String(p) } }));
+}
+
+const page = Number(Astro.params.page);
+const ch = pages.videos;
+const rest = (await getCollection('videos'))
+  .filter((v) => !v.data.hidden && !v.data.featured)
+  .sort(byVideoOrder);
+const { slice, current, lastPage } = paginate(rest, page);
+---
+
+<BaseLayout
+  title={`Videos — page ${current} — Mohammed Akash`}
+  description="Videos by Mohammed Akash — building in public on YouTube."
+>
+  <section class="mx-auto max-w-6xl px-5 py-14">
+    <SectionHero title={ch.title} intro={ch.intro} motif="videos" />
+    <VideosList items={slice} />
+    <Pagination current={current} last={lastPage} base="/videos" />
+  </section>
+</BaseLayout>

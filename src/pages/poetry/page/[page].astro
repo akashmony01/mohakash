@@ -1,0 +1,36 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SectionHero from '../../../components/SectionHero.astro';
+import PoetryList from '../../../components/lists/PoetryList.astro';
+import Pagination from '../../../components/Pagination.astro';
+import pages from '../../../data/pages.json';
+import { isSectionVisible } from '../../../config/sections';
+import { paginate, extraPageNumbers } from '../../../config/pagination';
+import { byDateDesc } from '../../../config/sort';
+
+export async function getStaticPaths() {
+  if (!isSectionVisible('poetry')) return [];
+  const rest = (await getCollection('poetry'))
+    .filter((p) => !p.data.hidden && !p.data.featured)
+    .sort(byDateDesc);
+  return extraPageNumbers(rest.length).map((p) => ({ params: { page: String(p) } }));
+}
+
+const page = Number(Astro.params.page);
+const rest = (await getCollection('poetry'))
+  .filter((p) => !p.data.hidden && !p.data.featured)
+  .sort(byDateDesc);
+const { slice, current, lastPage } = paginate(rest, page);
+---
+
+<BaseLayout
+  title={`Poetry — page ${current} — Mohammed Akash`}
+  description="Poems by Mohammed Akash — verses and fragments written under the sky."
+>
+  <section class="mx-auto max-w-6xl px-5 py-14">
+    <SectionHero title={pages.poetry.title} intro={pages.poetry.intro} motif="poetry" />
+    <PoetryList items={slice} />
+    <Pagination current={current} last={lastPage} base="/poetry" />
+  </section>
+</BaseLayout>

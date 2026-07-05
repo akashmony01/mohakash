@@ -1,0 +1,47 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../../../layouts/BaseLayout.astro';
+import SectionHero from '../../../../../components/SectionHero.astro';
+import BlogFilter from '../../../../../components/BlogFilter.astro';
+import BlogList from '../../../../../components/lists/BlogList.astro';
+import Pagination from '../../../../../components/Pagination.astro';
+import pages from '../../../../../data/pages.json';
+import { isSectionVisible } from '../../../../../config/sections';
+import { paginate, extraPageNumbers } from '../../../../../config/pagination';
+import { byDateDesc } from '../../../../../config/sort';
+import { BLOG_CATEGORIES, categoryBySlug } from '../../../../../config/blog';
+
+export async function getStaticPaths() {
+  if (!isSectionVisible('blog')) return [];
+  const all = (await getCollection('blog')).filter((p) => !p.data.draft && !p.data.hidden && !p.data.featured);
+  const paths = [];
+  for (const c of BLOG_CATEGORIES) {
+    const count = all.filter((p) => p.data.category === c.label).length;
+    for (const p of extraPageNumbers(count)) {
+      paths.push({ params: { category: c.slug, page: String(p) } });
+    }
+  }
+  return paths;
+}
+
+const slug = Astro.params.category!;
+const category = categoryBySlug(slug)!;
+const page = Number(Astro.params.page);
+const rest = (await getCollection('blog'))
+  .filter((p) => !p.data.draft && !p.data.hidden && !p.data.featured && p.data.category === category.label)
+  .sort(byDateDesc);
+const { slice, current, lastPage } = paginate(rest, page);
+const base = `/blog/topic/${slug}`;
+---
+
+<BaseLayout
+  title={`${category.label} — Blog — page ${current} — Mohammed Akash`}
+  description={`${category.label} posts by Mohammed Akash.`}
+>
+  <section class="mx-auto max-w-6xl px-5 py-14">
+    <SectionHero title={pages.blog.title} intro={pages.blog.intro} motif="blog" />
+    <BlogFilter active={slug} />
+    <BlogList items={slice} />
+    <Pagination current={current} last={lastPage} base={base} />
+  </section>
+</BaseLayout>

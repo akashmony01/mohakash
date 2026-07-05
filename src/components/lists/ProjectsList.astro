@@ -1,0 +1,41 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Masonry from '../Masonry.astro';
+import FeaturedTag from '../FeaturedTag.astro';
+
+interface Props {
+  items: CollectionEntry<'projects'>[];
+  cols?: 1 | 2 | 3;
+  masonry?: boolean;
+  // Featured strip → show the corner "Featured" tag.
+  featured?: boolean;
+}
+// Projects stay a plain equal-height grid (masonry off) — the masonry/varied
+// treatment is only for the text-heavy blog + poetry listings.
+const { items, cols = 2, masonry = false, featured = false } = Astro.props;
+const colsSm = (cols >= 2 ? 2 : 1) as 1 | 2 | 3;
+---
+
+<Masonry enhance={masonry} colsSm={colsSm} colsLg={cols} gap={5}>
+  {items.map((p) => (
+    <a
+      href={`/projects/${p.id}`}
+      class:list={['group relative flex flex-col rounded-xl border border-border bg-surface p-8 card-cosmic hover:border-accent/50', featured && 'pb-12']}
+    >
+      <div class="flex items-baseline justify-between gap-3">
+        <h2 class="font-sans text-xl font-semibold text-text">{p.data.title}</h2>
+        {p.data.year && <span class="text-sm text-muted">{p.data.year}</span>}
+      </div>
+      <p class="mt-2 flex-1 text-sm leading-relaxed text-muted">{p.data.summary}</p>
+      {p.data.stack.length > 0 && (
+        <ul class="mt-4 flex flex-wrap gap-2">
+          {p.data.stack.map((s) => (
+            <li class="rounded-full border border-border px-2.5 py-0.5 text-xs text-muted">{s}</li>
+          ))}
+        </ul>
+      )}
+      <span class="mt-5 text-accent transition-transform duration-200 group-hover:translate-x-1">View →</span>
+      {featured && <FeaturedTag />}
+    </a>
+  ))}
+</Masonry>

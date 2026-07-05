@@ -4,5 +4,6 @@
   "siteTitle": "Mohammed Akash — the infinite sky",
   "siteDescription": "Mohammed Akash (moh·akash, “the infinite sky”) — web developer, researcher, and poet. Projects, poetry, research, and notes on building with Claude.",
   "portraitLight": "/uploads/portraitLight.png",
-  "portraitDark": "/uploads/portraitDark.png"
+  "portraitDark": "/uploads/portraitDark.png",
+  "postsPerPage": 9
 }

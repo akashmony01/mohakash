@@ -1,0 +1,49 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { youtubeEmbed } from '../../config/youtube';
+import Masonry from '../Masonry.astro';
+import FeaturedTag from '../FeaturedTag.astro';
+
+interface Props {
+  items: CollectionEntry<'videos'>[];
+  cols?: 1 | 2 | 3;
+  masonry?: boolean;
+  // Featured strip → show the corner "Featured" tag.
+  featured?: boolean;
+}
+// Videos stay a plain equal-height grid (masonry off) — the masonry/varied
+// treatment is only for the text-heavy blog + poetry listings.
+const { items, cols = 3, masonry = false, featured = false } = Astro.props;
+const colsSm = (cols >= 2 ? 2 : 1) as 1 | 2 | 3;
+---
+
+<Masonry enhance={masonry} colsSm={colsSm} colsLg={cols} gap={8}>
+  {items.map((v) => {
+    const embed = youtubeEmbed(v.data.youtube);
+    return (
+      <div class:list={['relative flex flex-col', featured && 'pb-9']}>
+        {embed ? (
+          <div class="aspect-video w-full overflow-hidden rounded-xl border border-border bg-black">
+            <iframe
+              class="h-full w-full border-0"
+              src={embed}
+              title={v.data.title}
+              loading="lazy"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowfullscreen
+            ></iframe>
+          </div>
+        ) : (
+          <div class="aspect-video w-full rounded-xl border border-border bg-surface p-4 text-sm text-muted">
+            Invalid YouTube link — check this video's “youtube” field.
+          </div>
+        )}
+        <h2 class="mt-3 font-sans text-lg font-semibold text-text">{v.data.title}</h2>
+        {v.data.description && (
+          <p class="mt-1 text-sm leading-relaxed text-muted">{v.data.description}</p>
+        )}
+        {featured && <FeaturedTag />}
+      </div>
+    );
+  })}
+</Masonry>

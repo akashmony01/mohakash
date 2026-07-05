@@ -1,0 +1,36 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SectionHero from '../../../components/SectionHero.astro';
+import ProjectsList from '../../../components/lists/ProjectsList.astro';
+import Pagination from '../../../components/Pagination.astro';
+import pages from '../../../data/pages.json';
+import { isSectionVisible } from '../../../config/sections';
+import { paginate, extraPageNumbers } from '../../../config/pagination';
+import { byProjectOrder } from '../../../config/sort';
+
+export async function getStaticPaths() {
+  if (!isSectionVisible('projects')) return [];
+  const rest = (await getCollection('projects'))
+    .filter((p) => !p.data.hidden && !p.data.featured)
+    .sort(byProjectOrder);
+  return extraPageNumbers(rest.length).map((p) => ({ params: { page: String(p) } }));
+}
+
+const page = Number(Astro.params.page);
+const rest = (await getCollection('projects'))
+  .filter((p) => !p.data.hidden && !p.data.featured)
+  .sort(byProjectOrder);
+const { slice, current, lastPage } = paginate(rest, page);
+---
+
+<BaseLayout
+  title={`Projects — page ${current} — Mohammed Akash`}
+  description="Freelance web development work by Mohammed Akash — sites and apps I design and build."
+>
+  <section class="mx-auto max-w-6xl px-5 py-14">
+    <SectionHero title={pages.projects.title} intro={pages.projects.intro} motif="projects" />
+    <ProjectsList items={slice} />
+    <Pagination current={current} last={lastPage} base="/projects" />
+  </section>
+</BaseLayout>

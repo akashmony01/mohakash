@@ -3,5 +3,5 @@
   "poetry": true,
   "research": true,
   "blog": true,
-  "videos": false
+  "videos": true
 }

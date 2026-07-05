@@ -21,7 +21,7 @@ const links = visibleNav(nav.header);
     <BrandLogo class="text-white" trigger="load" />
 
     <!-- Desktop nav -->
-    <ul class="hidden items-center gap-7 sm:flex">
+    <ul class="hidden items-center gap-7 lg:flex">
       {links.map((l) => (
         <li>
           <a
@@ -49,7 +49,7 @@ const links = visibleNav(nav.header);
     </ul>
 
     <!-- Mobile controls -->
-    <div class="flex items-center gap-1 sm:hidden">
+    <div class="flex items-center gap-1 lg:hidden">
       <ThemeToggle />
       <button
         @click.stop="open = !open"
@@ -69,7 +69,7 @@ const links = visibleNav(nav.header);
     x-cloak
     x-transition.origin.top
     @click.outside="open = false"
-    class="relative overflow-hidden border-t border-white/20 bg-accent sm:hidden"
+    class="relative overflow-hidden border-t border-white/20 bg-accent lg:hidden"
   >
     <!-- abstract sky elements -->
     <div class="pointer-events-none absolute inset-0" aria-hidden="true">

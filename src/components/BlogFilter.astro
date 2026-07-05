@@ -1,0 +1,28 @@
+---
+import { BLOG_CATEGORIES } from '../config/blog';
+
+// `active` is a category slug, or 'all' for the unfiltered /blog view. The
+// filter is now real links (not a client-side toggle) so it composes with
+// SEO-friendly pagination — each category is its own crawlable, paginated URL.
+interface Props {
+  active: string;
+}
+const { active } = Astro.props;
+
+const tabs = [{ label: 'All', slug: 'all', href: '/blog' }, ...BLOG_CATEGORIES.map((c) => ({ label: c.label, slug: c.slug, href: `/blog/topic/${c.slug}` }))];
+---
+
+<div class="mb-10 flex flex-wrap gap-2">
+  {tabs.map((t) => (
+    <a
+      href={t.href}
+      aria-current={t.slug === active ? 'page' : undefined}
+      class:list={[
+        'rounded-full border px-3.5 py-1.5 text-sm transition-colors',
+        t.slug === active
+          ? 'border-accent text-text'
+          : 'border-border text-muted hover:text-text',
+      ]}
+    >{t.label}</a>
+  ))}
+</div>

@@ -2,6 +2,7 @@
 title: "Comparing Imputation and Clustering Pipelines on Incomplete Suicide Data from Bangladesh"
 date: 2026-06-15
 type: paper
+featured: true
 abstract: >-
   An exploratory study on 1,617 newspaper-reported suicide cases from Bangladesh
   — a country with no central suicide registry. We test 32 combinations of

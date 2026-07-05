@@ -1,0 +1,104 @@
+---
+/*
+  Order-preserving masonry.
+
+  Server output is a plain responsive CSS grid in source order — that's the
+  no-JS fallback (and what crawlers see): perfect latest→oldest order, just not
+  packed. When `enhance` is set, a tiny script re-buckets the cards round-robin
+  into the current column count (card i → column i % n) and re-runs on resize.
+  Round-robin keeps reading order: the top row is the newest N items, the next
+  visual row the following N, etc. — while each card keeps its natural height,
+  so the columns pack with no equal-height gaps.
+
+  `enhance={false}` (used by the featured strips) leaves it a normal equal-height
+  grid with no JS at all.
+*/
+interface Props {
+  enhance?: boolean;
+  colsSm?: 1 | 2 | 3;
+  colsLg?: 1 | 2 | 3;
+  gap?: 5 | 8;
+}
+const { enhance = true, colsSm = 2, colsLg = 3, gap = 5 } = Astro.props;
+
+const SM = { 1: '', 2: 'sm:grid-cols-2', 3: 'sm:grid-cols-3' };
+const LG = { 1: '', 2: 'lg:grid-cols-2', 3: 'lg:grid-cols-3' };
+const GAP_CLASS = { 5: 'gap-5', 8: 'gap-8' };
+const GAP_REM = { 5: '1.25rem', 8: '2rem' };
+---
+
+<div
+  class:list={['grid grid-cols-1', SM[colsSm], LG[colsLg], GAP_CLASS[gap], enhance && 'items-start']}
+  data-masonry={enhance ? '' : undefined}
+  data-cols-sm={enhance ? colsSm : undefined}
+  data-cols-lg={enhance ? colsLg : undefined}
+  data-gap={enhance ? GAP_REM[gap] : undefined}
+>
+  <slot />
+</div>
+
+<script>
+  function colCount(el: HTMLElement): number {
+    const w = window.innerWidth;
+    const sm = parseInt(el.dataset.colsSm || '1', 10) || 1;
+    const lg = parseInt(el.dataset.colsLg || '', 10) || sm;
+    if (w >= 1024) return lg;
+    if (w >= 640) return sm;
+    return 1;
+  }
+
+  function layout(el: HTMLElement) {
+    const n = colCount(el);
+    // @ts-ignore — cache last column count so a resize within the same
+    // breakpoint doesn't thrash the DOM.
+    if (n === el.__cols) return;
+    // @ts-ignore
+    el.__cols = n;
+    // @ts-ignore — original cards, snapshotted in source order at init.
+    const items: HTMLElement[] = el.__items;
+    const gap = el.dataset.gap || '1.25rem';
+
+    el.style.display = 'flex';
+    el.style.alignItems = 'flex-start';
+    el.style.gap = gap;
+    el.replaceChildren();
+
+    const cols: HTMLElement[] = [];
+    for (let i = 0; i < n; i++) {
+      const c = document.createElement('div');
+      c.style.display = 'flex';
+      c.style.flexDirection = 'column';
+      c.style.gap = gap;
+      c.style.flex = '1 1 0';
+      c.style.minWidth = '0';
+      cols.push(c);
+      el.appendChild(c);
+    }
+    items.forEach((item, i) => cols[i % n].appendChild(item));
+  }
+
+  function init() {
+    document.querySelectorAll<HTMLElement>('[data-masonry]').forEach((el) => {
+      // @ts-ignore
+      if (el.__masonryInit) return;
+      // @ts-ignore
+      el.__masonryInit = true;
+      // @ts-ignore
+      el.__items = Array.from(el.children) as HTMLElement[];
+      // @ts-ignore
+      el.__cols = -1;
+      layout(el);
+    });
+  }
+
+  let t: ReturnType<typeof setTimeout>;
+  window.addEventListener('resize', () => {
+    clearTimeout(t);
+    t = setTimeout(() => {
+      document.querySelectorAll<HTMLElement>('[data-masonry]').forEach(layout);
+    }, 150);
+  });
+
+  if (document.readyState !== 'loading') init();
+  else document.addEventListener('DOMContentLoaded', init);
+</script>

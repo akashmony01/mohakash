@@ -1,0 +1,57 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Masonry from '../Masonry.astro';
+import FeaturedTag from '../FeaturedTag.astro';
+import { pickTier } from '../../config/vary';
+
+interface Props {
+  items: CollectionEntry<'blog'>[];
+  cols?: 1 | 2 | 3;
+  masonry?: boolean;
+  // Column count at the sm/tablet range. Defaults from `cols`; featured strips
+  // pass 1 so they stay full-width until lg (never blending with normal cards
+  // when the main grid drops to 2 columns).
+  colsSm?: 1 | 2 | 3;
+  // Featured strip → show the corner "Featured" tag.
+  featured?: boolean;
+}
+const { items, cols = 3, masonry = true, colsSm: colsSmProp, featured = false } = Astro.props;
+const colsSm = (colsSmProp ?? (cols >= 2 ? 2 : 1)) as 1 | 2 | 3;
+
+const readingTime = (body = '') =>
+  Math.max(1, Math.round(body.split(/\s+/).filter(Boolean).length / 200));
+
+const fmt = (d: Date) =>
+  d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+
+// Trim only what's *shown* — the full excerpt stays in the file. In masonry we
+// WANT big height differences, so each card gets a DIFFERENT cap (chosen
+// deterministically from its id) spread across a wide range — some cards show
+// a single line, others a full paragraph. The equal-height featured grid keeps
+// one tight cap so those uniform cards stay even. Cuts on a word boundary.
+const EXCERPT_TIERS = [70, 140, 220, 320, 440];
+const clip = (s = '', id = '') => {
+  const max = masonry ? pickTier(id, EXCERPT_TIERS) : 160;
+  const t = s.trim();
+  return t.length > max ? t.slice(0, max).replace(/\s+\S*$/, '') + '…' : t;
+};
+---
+
+<Masonry enhance={masonry} colsSm={colsSm} colsLg={cols} gap={5}>
+  {items.map((p) => (
+    <a
+      href={`/blog/${p.id}`}
+      class:list={['group relative flex flex-col rounded-xl border border-border bg-surface p-6 card-cosmic hover:border-accent/50', featured && 'pb-10']}
+    >
+      <div class="flex flex-wrap items-center gap-3 text-xs text-muted">
+        <span class="rounded-full border border-border px-2 py-0.5 text-spark">{p.data.category}</span>
+        <span>{fmt(p.data.date)}</span>
+        <span>· {readingTime(p.body)} min read</span>
+      </div>
+      <h2 class="mt-3 font-sans text-xl font-semibold text-text transition-colors group-hover:text-accent">{p.data.title}</h2>
+      <p class="mt-2 flex-1 text-sm leading-relaxed text-muted">{clip(p.data.excerpt, p.id)}</p>
+      <span class="mt-5 text-sm text-accent transition-transform duration-200 group-hover:translate-x-1">Read →</span>
+      {featured && <FeaturedTag />}
+    </a>
+  ))}
+</Masonry>

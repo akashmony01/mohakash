@@ -1,0 +1,78 @@
+---
+/*
+  Numbered pagination for section listings. Page 1 lives at `base` (e.g.
+  "/blog"); every later page at `base/page/N` (e.g. "/blog/page/2"). Renders
+  nothing when there's only one page. Category listings pass their own base
+  (e.g. "/blog/topic/notes").
+*/
+interface Props {
+  current: number;
+  last: number;
+  base: string;
+}
+const { current, last, base } = Astro.props;
+
+const href = (p: number) => (p <= 1 ? base : `${base}/page/${p}`);
+
+// Compact window of page numbers around the current page, with the first/last
+// always shown and gaps marked by an ellipsis.
+const nums: (number | '…')[] = [];
+if (last <= 7) {
+  for (let p = 1; p <= last; p++) nums.push(p);
+} else {
+  const around = new Set([1, last, current - 1, current, current + 1]);
+  let prev = 0;
+  for (let p = 1; p <= last; p++) {
+    if (around.has(p)) {
+      if (p - prev > 1) nums.push('…');
+      nums.push(p);
+      prev = p;
+    }
+  }
+}
+---
+
+{last > 1 && (
+  <nav class="mt-14 flex flex-wrap items-center justify-center gap-1.5 text-sm" aria-label="Pagination">
+    <a
+      href={href(current - 1)}
+      class:list={[
+        'rounded-lg border border-border px-3 py-1.5 transition-colors',
+        current <= 1
+          ? 'pointer-events-none opacity-40'
+          : 'text-muted hover:border-accent hover:text-accent',
+      ]}
+      aria-disabled={current <= 1}
+      rel="prev"
+    >← Prev</a>
+
+    {nums.map((n) =>
+      n === '…' ? (
+        <span class="px-2 text-muted">…</span>
+      ) : (
+        <a
+          href={href(n)}
+          aria-current={n === current ? 'page' : undefined}
+          class:list={[
+            'min-w-[2.25rem] rounded-lg border px-3 py-1.5 text-center transition-colors',
+            n === current
+              ? 'border-accent bg-accent/10 text-accent'
+              : 'border-border text-muted hover:border-accent hover:text-accent',
+          ]}
+        >{n}</a>
+      )
+    )}
+
+    <a
+      href={href(current + 1)}
+      class:list={[
+        'rounded-lg border border-border px-3 py-1.5 transition-colors',
+        current >= last
+          ? 'pointer-events-none opacity-40'
+          : 'text-muted hover:border-accent hover:text-accent',
+      ]}
+      aria-disabled={current >= last}
+      rel="next"
+    >Next →</a>
+  </nav>
+)}

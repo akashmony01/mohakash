@@ -2,15 +2,21 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import SectionHero from '../../components/SectionHero.astro';
+import ProjectsList from '../../components/lists/ProjectsList.astro';
+import Pagination from '../../components/Pagination.astro';
 import pages from '../../data/pages.json';
 import { isSectionVisible } from '../../config/sections';
+import { paginate } from '../../config/pagination';
 
 const visible = isSectionVisible('projects');
-const projects = visible
-  ? (await getCollection('projects'))
-      .filter((p) => !p.data.hidden)
-      .sort((a, b) => a.data.order - b.data.order || (b.data.year ?? 0) - (a.data.year ?? 0))
+const byOrder = (a, b) => a.data.order - b.data.order || (b.data.year ?? 0) - (a.data.year ?? 0);
+const all = visible
+  ? (await getCollection('projects')).filter((p) => !p.data.hidden).sort(byOrder)
   : [];
+
+const featured = all.filter((p) => p.data.featured);
+const rest = all.filter((p) => !p.data.featured);
+const { slice, current, lastPage } = paginate(rest, 1);
 ---
 
 <BaseLayout
@@ -22,37 +28,20 @@ const projects = visible
       <p class="py-24 text-center text-muted">This section is currently unavailable.</p>
     ) : (
     <>
-    <SectionHero
-      title={pages.projects.title}
-      intro={pages.projects.intro}
-      motif="projects"
-    />
+    <SectionHero title={pages.projects.title} intro={pages.projects.intro} motif="projects" />
 
-    {projects.length === 0 ? (
+    {all.length === 0 ? (
       <p class="text-muted">Work in progress — projects landing here soon.</p>
     ) : (
-      <div class="grid gap-5 sm:grid-cols-2">
-        {projects.map((p) => (
-          <a
-            href={`/projects/${p.id}`}
-            class="group flex flex-col rounded-xl border border-border bg-surface p-8 card-cosmic hover:border-accent/50"
-          >
-            <div class="flex items-baseline justify-between gap-3">
-              <h2 class="font-sans text-xl font-semibold text-text">{p.data.title}</h2>
-              {p.data.year && <span class="text-sm text-muted">{p.data.year}</span>}
-            </div>
-            <p class="mt-2 flex-1 text-sm leading-relaxed text-muted">{p.data.summary}</p>
-            {p.data.stack.length > 0 && (
-              <ul class="mt-4 flex flex-wrap gap-2">
-                {p.data.stack.map((s) => (
-                  <li class="rounded-full border border-border px-2.5 py-0.5 text-xs text-muted">{s}</li>
-                ))}
-              </ul>
-            )}
-            <span class="mt-5 text-accent transition-transform duration-200 group-hover:translate-x-1">View →</span>
-          </a>
-        ))}
-      </div>
+      <>
+        {featured.length > 0 && (
+          <section class="mb-5">
+            <ProjectsList items={featured} cols={1} masonry={false} featured />
+          </section>
+        )}
+        <ProjectsList items={slice} />
+        <Pagination current={current} last={lastPage} base="/projects" />
+      </>
     )}
     </>
     )}

@@ -1,0 +1,53 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import SectionHero from '../../../../components/SectionHero.astro';
+import BlogFilter from '../../../../components/BlogFilter.astro';
+import BlogList from '../../../../components/lists/BlogList.astro';
+import Pagination from '../../../../components/Pagination.astro';
+import pages from '../../../../data/pages.json';
+import { isSectionVisible } from '../../../../config/sections';
+import { paginate } from '../../../../config/pagination';
+import { byDateDesc } from '../../../../config/sort';
+import { BLOG_CATEGORIES, categoryBySlug } from '../../../../config/blog';
+
+export async function getStaticPaths() {
+  if (!isSectionVisible('blog')) return [];
+  return BLOG_CATEGORIES.map((c) => ({ params: { category: c.slug } }));
+}
+
+const slug = Astro.params.category!;
+const category = categoryBySlug(slug)!;
+const all = (await getCollection('blog'))
+  .filter((p) => !p.data.draft && !p.data.hidden && p.data.category === category.label)
+  .sort(byDateDesc);
+
+const featured = all.filter((p) => p.data.featured);
+const rest = all.filter((p) => !p.data.featured);
+const { slice, current, lastPage } = paginate(rest, 1);
+const base = `/blog/topic/${slug}`;
+---
+
+<BaseLayout
+  title={`${category.label} — Blog — Mohammed Akash`}
+  description={`${category.label} posts by Mohammed Akash.`}
+>
+  <section class="mx-auto max-w-6xl px-5 py-14">
+    <SectionHero title={pages.blog.title} intro={pages.blog.intro} motif="blog" />
+    <BlogFilter active={slug} />
+
+    {all.length === 0 ? (
+      <p class="text-muted">No posts in this category yet.</p>
+    ) : (
+      <>
+        {featured.length > 0 && (
+          <section class="mb-5">
+            <BlogList items={featured} cols={2} colsSm={1} masonry={false} featured />
+          </section>
+        )}
+        <BlogList items={slice} />
+        <Pagination current={current} last={lastPage} base={base} />
+      </>
+    )}
+  </section>
+</BaseLayout>

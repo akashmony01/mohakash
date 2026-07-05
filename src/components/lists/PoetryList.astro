@@ -1,0 +1,64 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Masonry from '../Masonry.astro';
+import FeaturedTag from '../FeaturedTag.astro';
+import { pickTier } from '../../config/vary';
+
+interface Props {
+  items: CollectionEntry<'poetry'>[];
+  cols?: 1 | 2 | 3;
+  masonry?: boolean;
+  // Column count at the sm/tablet range. Defaults from `cols`; featured strips
+  // pass 1 so they stay full-width until lg (never blending with normal cards
+  // when the main grid drops to 2 columns).
+  colsSm?: 1 | 2 | 3;
+  // Featured strip → show the corner "Featured" tag.
+  featured?: boolean;
+}
+const { items, cols = 3, masonry = true, colsSm: colsSmProp, featured = false } = Astro.props;
+const colsSm = (colsSmProp ?? (cols >= 2 ? 2 : 1)) as 1 | 2 | 3;
+
+// Month + year only — a poem can span several days, so we don't show an exact
+// day (and the stored day is synthetic for most imports anyway). UTC keeps the
+// month stable regardless of the viewer's timezone.
+const fmt = (d: Date) =>
+  d.toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+
+// In masonry each poem previews a DIFFERENT number of opening lines (chosen
+// deterministically from its id, spread 2–9) so card heights differ hard —
+// some show a couplet, others most of a stanza. Off-masonry (featured grid)
+// stays a uniform 3 lines.
+const LINE_TIERS = [2, 3, 5, 7, 9];
+function preview(body = '', id = ''): string[] {
+  const max = masonry ? pickTier(id, LINE_TIERS) : 3;
+  return body.trim().split('\n').map((l) => l.trim()).filter(Boolean).slice(0, max);
+}
+---
+
+<Masonry enhance={masonry} colsSm={colsSm} colsLg={cols} gap={5}>
+  {items.map((p) => (
+    <a
+      href={`/poetry/${p.id}`}
+      class:list={['group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-surface p-6 card-cosmic', featured && 'pb-10']}
+    >
+      <!-- subtle abstract corner -->
+      <svg class="pointer-events-none absolute -right-6 -top-6 h-24 w-24 text-accent/10 transition-colors group-hover:text-accent/20" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+        <circle cx="50" cy="50" r="40" stroke="currentColor" stroke-width="0.8" />
+        <circle cx="50" cy="50" r="26" stroke="currentColor" stroke-width="0.8" />
+        <g fill="currentColor"><circle cx="50" cy="10" r="1.8" /><circle cx="90" cy="50" r="1.4" /></g>
+      </svg>
+
+      <div class="relative flex items-baseline justify-between gap-3">
+        <h2 class="font-sans text-xl font-semibold text-text transition-colors group-hover:text-accent">{p.data.title}</h2>
+        <span class="shrink-0 text-sm text-muted">{fmt(p.data.date)}</span>
+      </div>
+
+      <p class="relative mt-4 flex-1 whitespace-pre-line font-sans text-sm italic leading-relaxed text-muted">
+        {preview(p.body, p.id).join('\n')}
+      </p>
+
+      <span class="relative mt-5 text-sm text-accent transition-transform duration-200 group-hover:translate-x-1">Read →</span>
+      {featured && <FeaturedTag />}
+    </a>
+  ))}
+</Masonry>

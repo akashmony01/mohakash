@@ -1,0 +1,38 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SectionHero from '../../../components/SectionHero.astro';
+import BlogFilter from '../../../components/BlogFilter.astro';
+import BlogList from '../../../components/lists/BlogList.astro';
+import Pagination from '../../../components/Pagination.astro';
+import pages from '../../../data/pages.json';
+import { isSectionVisible } from '../../../config/sections';
+import { paginate, extraPageNumbers } from '../../../config/pagination';
+import { byDateDesc } from '../../../config/sort';
+
+export async function getStaticPaths() {
+  if (!isSectionVisible('blog')) return [];
+  const rest = (await getCollection('blog'))
+    .filter((p) => !p.data.draft && !p.data.hidden && !p.data.featured)
+    .sort(byDateDesc);
+  return extraPageNumbers(rest.length).map((p) => ({ params: { page: String(p) } }));
+}
+
+const page = Number(Astro.params.page);
+const rest = (await getCollection('blog'))
+  .filter((p) => !p.data.draft && !p.data.hidden && !p.data.featured)
+  .sort(byDateDesc);
+const { slice, current, lastPage } = paginate(rest, page);
+---
+
+<BaseLayout
+  title={`Blog — page ${current} — Mohammed Akash`}
+  description="Thinking in public by Mohammed Akash — notes on building with Claude, development, and ideas worth keeping."
+>
+  <section class="mx-auto max-w-6xl px-5 py-14">
+    <SectionHero title={pages.blog.title} intro={pages.blog.intro} motif="blog" />
+    <BlogFilter active="all" />
+    <BlogList items={slice} />
+    <Pagination current={current} last={lastPage} base="/blog" />
+  </section>
+</BaseLayout>

@@ -2,6 +2,7 @@
 title: 'Building with Claude: Finding Passive Income Without Losing Myself'
 date: 2026-06-20
 category: Building with Claude
+featured: true
 excerpt: A long, honest conversation with Claude about passive income, identity, and what's actually realistic on an $800/month salary in Bangladesh — plus the simple prompt system we built to turn any workday into a blog post.
 ---
 

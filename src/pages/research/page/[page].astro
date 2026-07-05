@@ -1,0 +1,36 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SectionHero from '../../../components/SectionHero.astro';
+import ResearchList from '../../../components/lists/ResearchList.astro';
+import Pagination from '../../../components/Pagination.astro';
+import pages from '../../../data/pages.json';
+import { isSectionVisible } from '../../../config/sections';
+import { paginate, extraPageNumbers } from '../../../config/pagination';
+import { byDateDesc } from '../../../config/sort';
+
+export async function getStaticPaths() {
+  if (!isSectionVisible('research')) return [];
+  const rest = (await getCollection('research'))
+    .filter((e) => !e.data.hidden && !e.data.featured)
+    .sort(byDateDesc);
+  return extraPageNumbers(rest.length).map((p) => ({ params: { page: String(p) } }));
+}
+
+const page = Number(Astro.params.page);
+const rest = (await getCollection('research'))
+  .filter((e) => !e.data.hidden && !e.data.featured)
+  .sort(byDateDesc);
+const { slice, current, lastPage } = paginate(rest, page);
+---
+
+<BaseLayout
+  title={`Research — page ${current} — Mohammed Akash`}
+  description="Research by Mohammed Akash — notes, papers, and ongoing inquiry."
+>
+  <section class="mx-auto max-w-6xl px-5 py-14">
+    <SectionHero title={pages.research.title} intro={pages.research.intro} motif="research" />
+    <ResearchList items={slice} />
+    <Pagination current={current} last={lastPage} base="/research" />
+  </section>
+</BaseLayout>

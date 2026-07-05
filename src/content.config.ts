@@ -47,6 +47,7 @@ const poetry = defineCollection({
   schema: z.object({
     title: z.string(),
     date: z.coerce.date(),
+    featured: z.boolean().default(false),
     hidden: z.boolean().default(false),
   }),
 });
@@ -62,6 +63,7 @@ const research = defineCollection({
     link: optionalUrl,
     cover: optionalString,
     resources: z.array(resource).default([]),
+    featured: z.boolean().default(false),
     hidden: z.boolean().default(false),
   }),
 });
@@ -76,6 +78,7 @@ const blog = defineCollection({
     draft: z.boolean().default(false),
     cover: optionalString,
     resources: z.array(resource).default([]),
+    featured: z.boolean().default(false),
     hidden: z.boolean().default(false),
   }),
 });
@@ -90,6 +93,7 @@ const videos = defineCollection({
     youtube: z.string(), // full YouTube URL or bare video ID
     description: optionalString,
     order: z.number().default(0),
+    featured: z.boolean().default(false),
     hidden: z.boolean().default(false),
   }),
 });
