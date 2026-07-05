@@ -275,6 +275,12 @@ IF NO reflection sections exist:
 
 Either way, create a markdown blog post:
 
+IMPORTANT: Write this blog post entirely from Mohammed's (the user's) first-person perspective.
+- Use "I" when referring to Mohammed's actions, thoughts, mistakes
+- Use "Claude" or "the AI" when referring to what the AI did
+- The story is told from Mohammed's experience and viewpoint
+- Mohammed is the narrator, not Claude
+
 ---
 title: Building with Claude, [Today's Date]: [Main Insight]
 date: [Today's Date in YYYY-MM-DD format]
@@ -282,40 +288,48 @@ date: [Today's Date in YYYY-MM-DD format]
 
 ## Opening Hook
 2-3 sentences introducing the problem category (generalized, no project details).
+Write from Mohammed's perspective: "Today I debugged...", "I worked on..."
 
 ## The Problem We Were Solving
 Explain what kind of problem this was and why it matters.
+From Mohammed's viewpoint: "I was solving...", "The challenge I faced was..."
 Generalized language only - no client/company/site names.
 
 ## What I Tried First (The Approach)
-Detailed explanation of the initial thinking.
+Detailed explanation of Mohammed's initial thinking.
 Why this approach was chosen.
-Mental model and assumptions.
+Mohammed's mental model and assumptions.
+Use "I thought...", "I decided...", "My approach was..."
 Include relevant code snippets (generalized).
 
 ## What I Got Wrong
-Specific details about the mistake.
-Explain the false assumption.
-Why it was believed at the time.
-What changed the perspective.
+Mohammed's specific mistakes.
+Explain the false assumption Mohammed had.
+Why Mohammed believed it at the time.
+What changed Mohammed's perspective.
+Use "I assumed...", "I was wrong about...", "I didn't consider..."
 
 ## What Claude Got Wrong
-Specific details about my mistake.
-Why the approach seemed plausible but was wrong.
-What data was missing.
-How this derailed the investigation.
+Specific details about what Claude (the AI) did wrong.
+Why Claude's approach seemed plausible but was wrong.
+What data Claude was missing.
+How Claude's mistake derailed the investigation.
+Write this as: "Claude suggested...", "The AI missed...", "Claude's approach failed because..."
 
 ## What We Actually Solved
-Detailed explanation of the real solution.
+Detailed explanation of the real solution that Mohammed discovered.
 Why it worked.
-How it differed from the initial approach.
-The thinking process that led to it.
+How it differed from Mohammed's initial approach.
+The thinking process that led Mohammed to it.
+Use "I realized...", "I discovered...", "The actual fix was..."
 Include code if relevant (generalized, safe to share).
 
 ## Key Lessons Learned
 3-5 actionable insights that apply broadly.
+Lessons Mohammed learned from this experience.
 Explain the WHY behind each lesson.
 Show how these lessons apply beyond this specific work.
+Use "I learned...", "This taught me...", "The key insight is..."
 
 ---
 
@@ -329,8 +343,9 @@ CRITICAL REQUIREMENTS:
 - NO identifying business information
 - Code examples are generic and safe to share
 - Focus on METHODOLOGY and LEARNING
-
----
+- WRITTEN ENTIRELY FROM MOHAMMED'S FIRST-PERSON PERSPECTIVE
+- Mohammed is the narrator and protagonist
+- Claude is the supporting character in this story
 
 FILE SAVING:
 Save this as a markdown file with the filename: building-with-claude-[TODAY'S-DATE]-[SHORT-TITLE].md
@@ -357,6 +372,14 @@ MY BLOG POST:
 
 ---
 
+IMPORTANT: Write all social posts entirely from Mohammed's (the user's) first-person perspective.
+- Use "I" when referring to Mohammed's actions, thoughts, discoveries, mistakes
+- Use "Claude" when referring to what the AI did
+- Mohammed is the narrator and protagonist
+- The story is told from Mohammed's experience and viewpoint
+
+---
+
 INSTRUCTIONS:
 
 Create social posts in markdown format and save as a file.
@@ -371,50 +394,64 @@ date: [Today's Date]
 ## Twitter Thread
 
 Tweet 1:
-[Opening hook about the insight, not the project details]
+[Opening hook from Mohammed's POV about what I discovered/learned today]
+[Example: "Today I learned something about X that changes how I think about Y"]
 
 Tweet 2:
-[What you got wrong - the learning]
+[What I got wrong - my false assumption]
+[Example: "I was wrong about... I assumed..."]
 
 Tweet 3:
-[What Claude got wrong - the mistake]
+[What Claude got wrong - the AI's mistake]
+[Example: "Claude suggested... but missed that..."]
 
 Tweet 4:
-[The actual solution - the methodology]
+[The actual solution I discovered - the methodology]
+[Example: "Here's what actually worked..."]
 
 Tweet 5:
-[Key lesson 1 - broadly applicable]
+[Key lesson 1 I learned - broadly applicable]
+[Example: "I learned that..."]
 
 Tweet 6:
-[Key lesson 2 - broadly applicable]
+[Key lesson 2 I learned - broadly applicable]
+[Example: "This taught me..."]
 
 Tweet 7:
 [CTA with blog link]
+[Example: "Read my full reflection: [link]"]
 
 ---
 
 ## LinkedIn Post
 
-[200-300 word professional summary]
-[Focus on methodology and learning]
+[200-300 word professional summary from my perspective]
+[Start with what I worked on: "Today I debugged...", "I discovered...", "I learned..."]
+[What I got wrong and what I learned]
+[How Claude helped but also where it failed]
+[Key insights I gained]
 [Why this matters for developers/builders]
-[Generalized language throughout]
+[Generalized language throughout - no client info]
 [Include blog link]
+
+Write as a first-person reflection: "I've learned...", "My approach was...", "This experience taught me..."
 
 ---
 
 ## Reddit Post (Optional)
 
-[Story format - what happened, what you learned]
-[Conversational tone]
-[Humble and honest]
+[Story format - what happened, what I learned]
+[Conversational tone from my experience]
+[Humble and honest about my mistakes]
 [Generalized, no client info]
 [Link to full post]
+
+Use "I" throughout: "I was working on...", "I thought...", "I discovered...", "I realized..."
 
 ---
 
 TONE REQUIREMENTS:
-- Honest about mistakes
+- Honest about my mistakes
 - Focus on methodology and learning
 - Broadly applicable (not project-specific)
 - Invites critical thinking
@@ -422,6 +459,7 @@ TONE REQUIREMENTS:
 - Quotable tweets
 - Engaging LinkedIn post
 - Conversational Reddit post
+- ALWAYS from my (Mohammed's) first-person perspective
 
 ---
 
@@ -429,8 +467,8 @@ FILE SAVING:
 Save this as a markdown file with the filename: social-posts-[TODAY'S-DATE]-[BLOG-TITLE].md
 
 Examples:
-- social-posts-2026-06-25-form-validation.md
-- social-posts-2026-06-26-api-integration.md
+- social-posts-2026-06-25-certificates.md
+- social-posts-2026-06-26-methodology.md
 
 Use YYYY-MM-DD format for date.
 
