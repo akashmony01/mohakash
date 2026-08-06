@@ -2,7 +2,12 @@
 title: BackAtIt — the break reminder that makes you come back
 summary: A Linux break reminder built after too many hours sat still. It takes over the screen so you actually get up, then calls you back when the break is over — the half every other timer forgets.
 stack:
-  - '"Python", "GTK 3", "Bash", "PipeWire", "Debian packaging", "AppStream"'
+  - Python
+  - GTK 3
+  - Bash
+  - PipeWire
+  - Debian packaging
+  - AppStream
 year: 2026
 link: ''
 repo: https://github.com/akashmony01/BackAtIt
@@ -21,13 +26,13 @@ resources:
 This one started with my back.
 
 Long stretches of work without standing up will do that, and the fix is not
-complicated — get up, walk about, sit back down. The hard part is *remembering*,
+complicated — get up, walk about, sit back down. The hard part is _remembering_,
 and every reminder I tried was far too easy to wave away. A small notification
 in the corner of the screen, dismissed before I had even read it, and another
 hour gone.
 
 The problem was never the reminding. It was that the reminder arrived while I
-was mid-thought, and anything polite enough to be ignorable *got* ignored.
+was mid-thought, and anything polite enough to be ignorable _got_ ignored.
 
 So I built one that isn't.
 
@@ -56,7 +61,7 @@ back and keeps nagging until you answer it: a burst of alarm, then a longer and
 longer silence, then another burst. It is still going when you sit down, but it
 is not blaring continuously into an empty room while you are gone.
 
-Getting *back* at it is the point. It is in the name.
+Getting _back_ at it is the point. It is in the name.
 
 ## Why it is hard to ignore
 
@@ -77,7 +82,7 @@ Every one of those came from watching myself dismiss a break without noticing.
 
 ## It stays out of your way
 
-Being hard to ignore only works if it is not also *annoying*. Several things
+Being hard to ignore only works if it is not also _annoying_. Several things
 keep it from crossing that line:
 
 - **It knows when you are already away.** If you have not touched the mouse or
@@ -100,9 +105,9 @@ keep it from crossing that line:
 The heading and the message on both alerts are yours to rewrite. That sounds
 like a small thing and turned out not to be.
 
-Set the interval to twenty minutes and the wording to *"drink some water"* and
-you have a hydration reminder. Set it to an hour with *"look at something far
-away"* and it becomes an eye-strain timer — the twenty-twenty-twenty rule, with
+Set the interval to twenty minutes and the wording to _"drink some water"_ and
+you have a hydration reminder. Set it to an hour with \*"look at something far
+away"\* and it becomes an eye-strain timer — the twenty-twenty-twenty rule, with
 a nag you can't wave off. Change the sound too, and the same app can be a
 posture check, a stretch prompt, or a nudge to stand at a standing desk.
 
@@ -157,7 +162,7 @@ it something another person can actually install took its own pass:
   nameless script.
 - A **test suite** covering the schedule logic, the daemon's lifecycle, the
   alert window and the settings — because a program that wakes you up had
-  better be right about *when*.
+  better be right about _when_.
 
 Built and tested on Ubuntu 24.04 with GNOME. It follows the freedesktop
 desktop standards, so other Linux desktops should be fine. It is Linux-only
@@ -174,8 +179,8 @@ Three things, roughly in order:
    minutes to days, and reminders that survive a reboot — which is a real piece
    of design work, not a checkbox.
 2. **A quieter setting per reminder.** Taking over the screen is right for
-   *"your back hurts, stand up"*. It is almost certainly wrong for *"drink
-   water"* every twenty minutes. Each reminder should choose how loudly it
+   _"your back hurts, stand up"_. It is almost certainly wrong for \*"drink
+   water"\* every twenty minutes. Each reminder should choose how loudly it
    interrupts.
 3. **One language throughout.** The interface is Python and the background
    timer is shell. Unifying them is the groundwork that makes the first two
