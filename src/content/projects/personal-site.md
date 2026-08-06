@@ -1,26 +1,35 @@
 ---
-title: "mohakash.xyz — this site"
-summary: "A personal site bringing my projects, poetry, research, and writing together under one open sky — built static with Astro and a git-based CMS."
-stack: ["Astro", "Tailwind CSS", "Alpine.js", "Cloudflare Pages", "Sveltia CMS"]
+title: mohakash.xyz — this site
+summary: A personal site bringing my projects, poetry, research, and writing together under one open sky — built static with Astro and a git-based CMS.
+stack:
+  - Astro
+  - Tailwind CSS
+  - Alpine.js
+  - Cloudflare Pages
+  - Sveltia CMS
 year: 2026
+link: ''
+repo: https://github.com/akashmony01/mohakash
 featured: true
 order: 0
-repo: "https://github.com/akashmony01/mohakash"
+cover: /uploads/Screenshot from 2026-08-06 23-44-25.png
 resources:
-  - { label: "Live site", href: "https://mohakash.xyz", kind: live }
+  - label: Live site
+    href: https://mohakash.xyz
+    kind: live
 ---
 
 ## The brief
 
 One home for several selves — developer, researcher, poet, and someone writing in
 public about building with Claude. The hard part wasn't any single page; it was
-making four very different kinds of content feel like *one* coherent person
+making four very different kinds of content feel like _one_ coherent person
 rather than four stitched-together sites.
 
 ## The name does the work
 
-*Mohakash* — **moh** for Mohammed, **akash** for Akash — also means *the infinite
-sky*. That gave the whole thing a spine. The site reads like an open daytime sky:
+_Mohakash_ — **moh** for Mohammed, **akash** for Akash — also means \*the infinite
+sky\*. That gave the whole thing a spine. The site reads like an open daytime sky:
 a light, warm off-white canvas, a faint starfield, sky-blue accents over charcoal
 text, bold display headlines (Anton) above a clean grotesk body (Space Grotesk).
 A dark "night sky" mode is one click away and remembers your choice. Bengali
@@ -57,7 +66,7 @@ everything is changeable without touching code.
 ## Hosting and the moving parts
 
 The site is hosted on **Cloudflare Pages**, which rebuilds on every push to
-`main`. The two pieces that *do* need a backend run as serverless functions on
+`main`. The two pieces that _do_ need a backend run as serverless functions on
 the same deploy:
 
 - **Contact form** — a Cloudflare Pages Function that verifies a Turnstile token
@@ -79,5 +88,5 @@ to a clear entity, and full Open Graph / Twitter cards for link previews.
 
 A fast, quiet space that loads instantly and reads like a single considered
 voice — room for code, verse, and inquiry to sit side by side. And, fittingly,
-much of it was built *in public, with Claude* — which is the subject of the blog
+much of it was built _in public, with Claude_ — which is the subject of the blog
 itself.
