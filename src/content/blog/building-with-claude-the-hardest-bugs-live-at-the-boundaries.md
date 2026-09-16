@@ -1,5 +1,5 @@
 ---
-title: 'Building with Claude, 2026-09-16: The hardest bugs live at the boundaries'
+title: 'Building with Claude: The hardest bugs live at the boundaries'
 date: 2026-09-16
 category: Building with Claude
 excerpt: 'Today I took a feature that had grown up *inside* one of my web projects — a newsletter system — and turned it into a standalone, installable plugin that any similar site could drop in. It sounded like a copy-paste-and-rename job. It was not. Almost every real problem I hit lived at the seams: where my code met a third-party package, where the plugin met the host project, and where one framework version disagreed with another.'
@@ -12,15 +12,15 @@ resources: []
 
 ## Opening Hook
 
-Today I took a feature that had grown up *inside* one of my web projects — a newsletter system — and turned it into a standalone, installable plugin that any similar site could drop in. It sounded like a copy-paste-and-rename job. It was not. Almost every real problem I hit lived at the seams: where my code met a third-party package, where the plugin met the host project, and where one framework version disagreed with another.
+Today I took a feature that had grown up _inside_ one of my web projects — a newsletter system — and turned it into a standalone, installable plugin that any similar site could drop in. It sounded like a copy-paste-and-rename job. It was not. Almost every real problem I hit lived at the seams: where my code met a third-party package, where the plugin met the host project, and where one framework version disagreed with another.
 
 ## The Problem I Was Solving
 
 I had a newsletter app living inside a larger site. It worked, but it was welded to that one project — it imported the host's models, assumed the host's settings, and couldn't be reused anywhere else. I wanted to extract it into a proper package: `pip install`, add a settings block, and it just works on any comparable site.
 
-This matters because "works in one project" and "works as a library" are completely different bars. A library can't assume anything about its host. It has to bring its own configuration, its own defaults, its own database migrations, and it has to survive being installed next to code it has never seen, on framework versions I didn't test against. The whole job is really about *boundaries*: drawing clean ones and defending them.
+This matters because "works in one project" and "works as a library" are completely different bars. A library can't assume anything about its host. It has to bring its own configuration, its own defaults, its own database migrations, and it has to survive being installed next to code it has never seen, on framework versions I didn't test against. The whole job is really about _boundaries_: drawing clean ones and defending them.
 
-There was an extra twist. My plugin didn't stand alone — it was built *on top of* a base package (the thing that actually stored subscribers and handled confirmations). So I wasn't just extracting my code; I was wrapping someone else's, and inheriting all of its assumptions too.
+There was an extra twist. My plugin didn't stand alone — it was built _on top of_ a base package (the thing that actually stored subscribers and handled confirmations). So I wasn't just extracting my code; I was wrapping someone else's, and inheriting all of its assumptions too.
 
 ## What I Tried First (The Approach)
 
@@ -38,7 +38,7 @@ I also pushed hard on simplicity at the setup seams. When I saw the install inst
 
 ## What I Got Wrong
 
-My biggest wrong assumption was believing **my plugin's settings controlled everything about its behavior.** They didn't. A huge amount of behavior came from the *base package* underneath, and it had its own machinery I hadn't mapped. The confirmation email's link domain came from a "sites" record, not my base-URL setting. Whether that link was `http` or `https` came from a flag on the base package that defaulted to `https` — so on my local machine every confirmation link came out as `https://localhost`, which no browser could open. I spent time convinced the plugin was broken when the plugin was fine; I just didn't understand what the base package was doing on its own.
+My biggest wrong assumption was believing **my plugin's settings controlled everything about its behavior.** They didn't. A huge amount of behavior came from the _base package_ underneath, and it had its own machinery I hadn't mapped. The confirmation email's link domain came from a "sites" record, not my base-URL setting. Whether that link was `http` or `https` came from a flag on the base package that defaulted to `https` — so on my local machine every confirmation link came out as `https://localhost`, which no browser could open. I spent time convinced the plugin was broken when the plugin was fine; I just didn't understand what the base package was doing on its own.
 
 I also made a classic integration mess. I had old code from a previous email-provider integration, and I mashed it into the new plugin's submission hook without thinking:
 
@@ -49,13 +49,13 @@ submission = super().process_form_submission(form)
 return self.get_submission_class().objects.create(...)   # creates a SECOND record
 ```
 
-Two bugs in four lines. `data['first_name']` threw a `KeyError` because my form had no such field, and I created the submission twice — once via `super()` and again by hand. I believed it because that code *used* to work in a different context. What changed my perspective was seeing that the plugin and the host each own their own flow, and I was clumsily stepping on both.
+Two bugs in four lines. `data['first_name']` threw a `KeyError` because my form had no such field, and I created the submission twice — once via `super()` and again by hand. I believed it because that code _used_ to work in a different context. What changed my perspective was seeing that the plugin and the host each own their own flow, and I was clumsily stepping on both.
 
 ## What Claude Got Wrong
 
-Claude made its share of mistakes, and some of them cost me time. The one that stung most: Claude generated a database migration on the **newer** framework version I happened to be running. That migration used a serialization format the **older** version literally couldn't parse. So it passed for Claude and then blew up the moment I installed the plugin into a project on the older version. Claude's approach *looked* fine — the tests were green — but "green on one version" hid a whole class of breakage. The fix became a rule: generate schema migrations on the *lowest* version you support.
+Claude made its share of mistakes, and some of them cost me time. The one that stung most: Claude generated a database migration on the **newer** framework version I happened to be running. That migration used a serialization format the **older** version literally couldn't parse. So it passed for Claude and then blew up the moment I installed the plugin into a project on the older version. Claude's approach _looked_ fine — the tests were green — but "green on one version" hid a whole class of breakage. The fix became a rule: generate schema migrations on the _lowest_ version you support.
 
-Claude also did a blanket find-and-replace during the rename that mangled a constant — a variable got a function call spliced into the middle of its name. And it wrote a setup guide using a secrets helper my project didn't have, so when I followed Claude's *own* instructions I hit a `NameError`. Then there was the "safe mode" that logged its output at a level nothing displays by default, so it looked like nothing happened when it was quietly working. Each of these was plausible in isolation, and each one derailed me for a bit because the failure didn't point at the real cause.
+Claude also did a blanket find-and-replace during the rename that mangled a constant — a variable got a function call spliced into the middle of its name. And it wrote a setup guide using a secrets helper my project didn't have, so when I followed Claude's _own_ instructions I hit a `NameError`. Then there was the "safe mode" that logged its output at a level nothing displays by default, so it looked like nothing happened when it was quietly working. Each of these was plausible in isolation, and each one derailed me for a bit because the failure didn't point at the real cause.
 
 ## What We Actually Solved
 
@@ -70,7 +70,7 @@ if getattr(field, "use_for_grouping", False) and field.field_type in CHOICE_TYPE
 
 Second, taming the base package: rather than fighting its email machinery, I routed its side-effects through one explicit mode switch I controlled — a single `DELIVERY` setting with modes like "log only", "print", "local inbox", and "real send". Once even the base package's confirmation email flowed through that switch, dev, staging, and production all behaved predictably.
 
-Third, cross-version safety: run the test suite on *every* supported version in separate virtualenvs, generate migrations on the oldest one, and loosen the version pins to a bounded range instead of nailing them to the exact versions on my machine.
+Third, cross-version safety: run the test suite on _every_ supported version in separate virtualenvs, generate migrations on the oldest one, and loosen the version pins to a bounded range instead of nailing them to the exact versions on my machine.
 
 And finally, setup ergonomics that turned my earlier complaints into features: a `with_required_apps()` helper so the host adds one line instead of five, a bundled URL include, and startup checks that turn silent runtime breakage into a clear message at boot. The confirmation-link problem was solved not with code but with understanding — set the site record and flip the base package's `https` flag off for local dev.
 
@@ -80,8 +80,8 @@ And finally, setup ergonomics that turned my earlier complaints into features: a
 
 **2. "Works on my machine" is the start of testing, not the end.** The migration disaster happened precisely because everything looked green on one version. Now I treat multi-version, multi-host verification as mandatory, not optional — anything that touches schemas or framework APIs gets run on the lowest supported version too.
 
-**3. Map the machinery you're wrapping before you trust your own settings.** I assumed my config controlled behavior it never touched. The lesson: when you build on a base package, explicitly trace where *it* gets its URLs, protocols, sender addresses, and side-effects — and decide, per mechanism, whether to respect it or route it through your own switch.
+**3. Map the machinery you're wrapping before you trust your own settings.** I assumed my config controlled behavior it never touched. The lesson: when you build on a base package, explicitly trace where _it_ gets its URLs, protocols, sender addresses, and side-effects — and decide, per mechanism, whether to respect it or route it through your own switch.
 
-**4. Give visible feedback for "did nothing real" paths.** A safe/dry-run mode that only logs quietly reads as broken. If an action deliberately does nothing external, it should *say so* where the user is actually looking.
+**4. Give visible feedback for "did nothing real" paths.** A safe/dry-run mode that only logs quietly reads as broken. If an action deliberately does nothing external, it should _say so_ where the user is actually looking.
 
 **5. Defend boundaries with discipline, not willpower.** Grep host imports down to zero. Integrate via abstract bases or attribute-reads, never imports. Back up host files before editing them, and do a clean-slate reinstall drill to prove your own install guide works. The discipline is boring; it's also what makes something genuinely reusable.
