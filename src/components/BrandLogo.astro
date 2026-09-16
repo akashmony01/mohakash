@@ -4,10 +4,11 @@
 // (header); trigger="view" fires when scrolled into view (footer), driven by
 // the IntersectionObserver in BaseLayout that watches `.brand-onview`.
 //
-// The second panel is the logo image (brand/logo.png → public/, plus recolored
-// variants from scripts/build-brand.mjs). It's two-tone and fixed, so the file
-// has to match its backdrop: `on="accent"` for the solid-blue header, and
-// `on="surface"` for the footer, which swaps with the theme.
+// The second panel is the logo mark, drawn from the vector original
+// (brand/logo.pdf → public/*.svg via scripts/build-brand.mjs). Each variant is
+// painted for one backdrop — the slash through the planet is filled with the
+// background colour so it reads as a gap — so pick with `on`: "accent" for the
+// solid-blue header, "surface" for the footer, which swaps with the theme.
 interface Props {
   class?: string;
   trigger?: 'load' | 'view';
@@ -16,7 +17,7 @@ interface Props {
 const { class: className = '', trigger = 'load', on = 'accent' } = Astro.props;
 
 // Intrinsic size of the mark, so the reserved box is right before it loads.
-const MARK = { width: 1000, height: 162, alt: '' } as const;
+const MARK = { width: 1311, height: 216, alt: '' } as const;
 ---
 
 <a
@@ -38,11 +39,11 @@ const MARK = { width: 1000, height: 162, alt: '' } as const;
       </span>
       <span class="brand-panel">
         {on === 'accent' ? (
-          <img src="/logo.png" {...MARK} class="h-6 w-auto" loading="eager" decoding="async" />
+          <img src="/logo.svg" {...MARK} class="h-6 w-auto" loading="eager" decoding="async" />
         ) : (
           <Fragment>
-            <img src="/logo-on-light.png" {...MARK} class="h-6 w-auto dark:hidden" decoding="async" />
-            <img src="/logo-on-dark.png" {...MARK} class="hidden h-6 w-auto dark:block" decoding="async" />
+            <img src="/logo-on-light.svg" {...MARK} class="h-6 w-auto dark:hidden" decoding="async" />
+            <img src="/logo-on-dark.svg" {...MARK} class="hidden h-6 w-auto dark:block" decoding="async" />
           </Fragment>
         )}
       </span>

@@ -1,14 +1,12 @@
 // Generate the served brand assets in public/ from the masters in brand/.
-// Run after replacing brand/logo.png or brand/favicon.png:
-//   node scripts/build-brand.mjs
+// Run after replacing a master:  npm run build:brand
 //
-// The wordmark is a two-tone PNG on transparency: white letters + a dark
-// (#151a2a) planet glyph. That single file only reads well on the blue header
-// — on the footer the white letters vanish in light mode and the planet (which
-// is exactly the dark-mode surface token) vanishes in dark mode. So we emit
-// recolored variants: each pixel's luminance says how far it sits between the
-// two source tones, and we remap that blend onto a new pair. Doing it as a
-// blend rather than a threshold keeps the antialiased edges smooth.
+// brand/logo.pdf is the original vector artwork (Canva, 3 pages: wordmark on
+// light, icon, wordmark on blue). brand/wordmark.svg and brand/icon.svg are
+// pages 1 and 2 extracted with:
+//   pdftocairo -svg -f 1 -l 1 brand/logo.pdf brand/wordmark.svg
+//   pdftocairo -svg -f 2 -l 2 brand/logo.pdf brand/icon.svg
+// They're committed so this script needs no poppler at build time.
 import { readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
@@ -16,184 +14,179 @@ import sharp from 'sharp';
 const root = new URL('../', import.meta.url);
 const p = (rel) => fileURLToPath(new URL(rel, root));
 
-const luma = ([r, g, b]) => 0.2126 * r + 0.7152 * g + 0.0722 * b;
-const clamp01 = (v) => (v < 0 ? 0 : v > 1 ? 1 : v);
+// ---------------------------------------------------------------------------
+// Wordmark
+//
+// The artwork has exactly three colour groups, and pdftocairo keeps each on a
+// distinct fill, so we can repaint them independently:
+//   letters  — seven <g fill> glyph groups
+//   planet   — two <path fill>, the disc and the needle through it
+//   cut      — one white <path>, the slash that separates needle from disc
+// The cut has to match whatever the mark sits on, so it reads as a gap rather
+// than a stray line. That, plus contrast, is why each backdrop gets its own
+// file instead of one shared asset.
+const SRC_LETTERS = 'rgb(0%, 0%, 0%)';
+const SRC_PLANET = 'rgb(21.958923%, 71.369934%, 100%)';
+const SRC_CUT = 'rgb(100%, 100%, 100%)';
 
-// The two tones present in the master wordmark.
-const SRC_PLANET = [21, 26, 42];
-const SRC_LETTER = [255, 255, 255];
+// Site palette (src/styles/global.css) — the mark's own #38B6FF is deliberately
+// not used, so the logo doesn't sit a shade off from everything around it.
+const ACCENT = '#1a8fd6';       // --color-accent
+const TEXT = '#0e1116';         // --color-text  (light)
+const TEXT_DARK = '#e8eaf2';    // --color-text  (dark)
+const SURFACE = '#ffffff';      // --color-surface (light)
+const SURFACE_DARK = '#151a2a'; // --color-surface (dark)
 
-// The master was cut out of its original background with a ~3px feather, which
-// left two defects: a soft alpha ramp several pixels wide, and a pale-blue
-// halo bled into the edge pixels' RGB. Together they read as blur and mute the
-// white. cleanWordmark() undoes both, returning a clean coverage mask plus a
-// continuous tone map (0 = planet, 1 = letter) that the variants colour in.
-const SUPER = 4;      // supersample factor used to harden the alpha edge
-const STEEPEN = 6;    // contrast applied to the alpha ramp at supersampled size
-const OUT_SCALE = 2;  // emit at 2x so the mark stays crisp on HiDPI screens
+async function loadWordmark() {
+  let svg = await readFile(p('brand/wordmark.svg'), 'utf8');
+  // Drop the full-bleed page background so the mark sits on transparency.
+  svg = svg.replace(/<rect\s+x="-150"[^>]*\/>/g, '');
+  return svg;
+}
 
-async function cleanWordmark(srcPath) {
-  const { data, info } = await sharp(srcPath).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
-  const { width: W, height: H } = info;
-  const N = W * H;
-
-  const alpha = Buffer.alloc(N);
-  const tone = new Float32Array(N);
-  const core = new Uint8Array(N);
-  const lo = luma(SRC_PLANET);
-  const hi = luma(SRC_LETTER);
-
-  for (let i = 0, p = 0; p < N; i += 4, p++) {
-    alpha[p] = data[i + 3];
-    // Only well-inside pixels are trusted for colour; the rest are feather.
-    core[p] = data[i + 3] >= 200 ? 1 : 0;
-    tone[p] = clamp01((luma([data[i], data[i + 1], data[i + 2]]) - lo) / (hi - lo));
-  }
-
-  // Repaint the untrusted edge pixels from the nearest trusted ones, so the
-  // blue halo is replaced by whichever tone the edge actually belongs to.
-  // Core pixels keep their measured tone, which preserves the antialiasing
-  // along the slash where it cuts across the planet.
-  const R = 4;
-  const toneFixed = new Float32Array(N);
-  for (let y = 0; y < H; y++) {
-    for (let x = 0; x < W; x++) {
-      const p = y * W + x;
-      if (core[p]) { toneFixed[p] = tone[p]; continue; }
-      let num = 0, den = 0;
-      for (let dy = -R; dy <= R; dy++) {
-        const yy = y + dy;
-        if (yy < 0 || yy >= H) continue;
-        for (let dx = -R; dx <= R; dx++) {
-          const xx = x + dx;
-          if (xx < 0 || xx >= W) continue;
-          const q = yy * W + xx;
-          if (!core[q]) continue;
-          const w = 1 / (1 + dx * dx + dy * dy);
-          num += tone[q] * w;
-          den += w;
-        }
+// Ink bounds in user units, so each variant can be cropped to the artwork
+// instead of inheriting the 1500x1500 page it was designed on.
+async function inkBox(svg) {
+  const SCALE = 1000 / 1500;
+  const { data, info } = await sharp(Buffer.from(svg), { density: 72 * SCALE })
+    .resize(1000, 1000, { fit: 'fill' })
+    .ensureAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+  let x0 = info.width, y0 = info.height, x1 = -1, y1 = -1;
+  for (let y = 0; y < info.height; y++) {
+    for (let x = 0; x < info.width; x++) {
+      if (data[(y * info.width + x) * 4 + 3] > 8) {
+        if (x < x0) x0 = x;
+        if (x > x1) x1 = x;
+        if (y < y0) y0 = y;
+        if (y > y1) y1 = y;
       }
-      toneFixed[p] = den > 0 ? num / den : 1;
     }
   }
-
-  const OW = W * OUT_SCALE, OH = H * OUT_SCALE;
-
-  // Harden the alpha: blow it up, push the soft ramp toward a step, then
-  // resample down. Doing the steepening supersampled is what leaves a clean
-  // one-pixel antialiased edge instead of a jagged one. Mitchell on the way
-  // down — lanczos rings on hard edges and would reintroduce a halo.
-  const up = await sharp(alpha, { raw: { width: W, height: H, channels: 1 } })
-    .resize(W * SUPER, H * SUPER, { kernel: 'cubic' })
-    // sharp promotes a raw 1-channel input to 3-channel sRGB on resize; pin it
-    // back to greyscale so the buffer stays one byte per pixel.
-    .toColourspace('b-w')
-    .raw()
-    .toBuffer();
-  for (let i = 0; i < up.length; i++) {
-    up[i] = Math.max(0, Math.min(255, Math.round((up[i] - 128) * STEEPEN + 128)));
-  }
-  const alphaOut = await sharp(up, { raw: { width: W * SUPER, height: H * SUPER, channels: 1 } })
-    .resize(OW, OH, { kernel: 'mitchell' })
-    .toColourspace('b-w')
-    .raw()
-    .toBuffer();
-
-  const toneBytes = Buffer.alloc(N);
-  for (let p = 0; p < N; p++) toneBytes[p] = Math.round(clamp01(toneFixed[p]) * 255);
-  const toneOut = await sharp(toneBytes, { raw: { width: W, height: H, channels: 1 } })
-    .resize(OW, OH, { kernel: 'mitchell' })
-    .toColourspace('b-w')
-    .raw()
-    .toBuffer();
-
-  return { width: OW, height: OH, alpha: alphaOut, tone: toneOut };
+  const u = 1500 / 1000; // px -> user units
+  const pad = 2 * u;     // a hair of margin so nothing clips at the edge
+  return {
+    x: Math.max(0, x0 * u - pad),
+    y: Math.max(0, y0 * u - pad),
+    w: (x1 - x0 + 1) * u + pad * 2,
+    h: (y1 - y0 + 1) * u + pad * 2,
+  };
 }
 
-// Paint a cleaned wordmark in a given pair of tones.
-async function writeVariant(mark, outPath, planet, letter) {
-  const { width, height, alpha, tone } = mark;
-  const rgba = Buffer.alloc(width * height * 4);
-  for (let p = 0; p < width * height; p++) {
-    const t = tone[p] / 255;
-    for (let c = 0; c < 3; c++) rgba[p * 4 + c] = Math.round(planet[c] + t * (letter[c] - planet[c]));
-    rgba[p * 4 + 3] = alpha[p];
-  }
-  const png = await sharp(rgba, { raw: { width, height, channels: 4 } }).png({ compressionLevel: 9 }).toBuffer();
-  await writeFile(p(outPath), png);
-  console.log('Wrote', outPath, `${width}x${height}`, png.length, 'bytes');
+function paint(svg, { letters, planet, cut }) {
+  return svg
+    .split(SRC_LETTERS).join(letters)
+    .split(SRC_PLANET).join(planet)
+    .split(SRC_CUT).join(cut);
 }
 
-const ACCENT = [26, 143, 214];  // --color-accent  #1a8fd6
-const TEXT = [14, 17, 22];      // --color-text    #0e1116 (light mode)
-const NAVY = SRC_PLANET;        // the mark's own dark tone
-const WHITE = [255, 255, 255];
+function reframe(svg, box) {
+  const vb = `${box.x.toFixed(2)} ${box.y.toFixed(2)} ${box.w.toFixed(2)} ${box.h.toFixed(2)}`;
+  return svg.replace(
+    /<svg([^>]*?)>/,
+    `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${box.w.toFixed(2)}" height="${box.h.toFixed(2)}" viewBox="${vb}">`,
+  );
+}
 
-const wordmark = await cleanWordmark(p('brand/logo.png'));
+const wordmarkSrc = await loadWordmark();
+const box = await inkBox(wordmarkSrc);
+console.log(`Wordmark ink box: ${box.w.toFixed(1)} x ${box.h.toFixed(1)} (aspect ${(box.w / box.h).toFixed(4)})`);
 
-// Header sits on solid accent blue, so it keeps the mark's own two tones.
-await writeVariant(wordmark, 'public/logo.png', NAVY, WHITE);
-// Footer sits on --color-surface, which flips with the theme.
-await writeVariant(wordmark, 'public/logo-on-light.png', ACCENT, TEXT);
-await writeVariant(wordmark, 'public/logo-on-dark.png', ACCENT, WHITE);
+const VARIANTS = [
+  // Header: solid accent bar, both themes.
+  ['public/logo.svg', { letters: SURFACE, planet: TEXT, cut: ACCENT }],
+  // Footer: --color-surface, which flips with the theme.
+  ['public/logo-on-light.svg', { letters: TEXT, planet: ACCENT, cut: SURFACE }],
+  ['public/logo-on-dark.svg', { letters: TEXT_DARK, planet: ACCENT, cut: SURFACE_DARK }],
+];
 
-// Favicons / PWA icons, all from the square master. The master is a flat RGB
-// image (blue planet on solid white), which shows as a white tile on dark
-// browser chrome, so we key the white out to alpha and trim the empty margin
-// to let the mark fill the icon. The diagonal slash is white too, and becomes a
-// transparent cut through the disc — which is the intended reading.
-async function markOnAlpha(srcPath) {
-  const { data, info } = await sharp(srcPath).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
-  const keyed = Buffer.alloc(data.length);
-  for (let i = 0; i < data.length; i += 4) {
-    const r = data[i], g = data[i + 1], b = data[i + 2];
-    const mx = Math.max(r, g, b), mn = Math.min(r, g, b);
-    // Distance from pure white drives alpha, so antialiased edges stay smooth.
-    const a = Math.min(255, 255 - mn + (mx - mn));
-    keyed[i] = r; keyed[i + 1] = g; keyed[i + 2] = b;
-    keyed[i + 3] = a > 250 ? 255 : a;
+for (const [out, tones] of VARIANTS) {
+  const svg = reframe(paint(wordmarkSrc, tones), box);
+  await writeFile(p(out), svg);
+  console.log('Wrote', out, svg.length, 'bytes');
+}
+
+// ---------------------------------------------------------------------------
+// Icon / favicons
+//
+// Same three groups as the wordmark. The slash has to be a real hole here,
+// because a favicon sits on browser chrome we don't control — a white slash
+// would be invisible on a light tab strip and a stray white line on a dark one.
+// Rather than restructure the vector into an SVG mask, we render twice: once
+// with the slash filled so we get the solid silhouette, once with only the
+// slash, then subtract the second coverage from the first. That's exact, and
+// the antialiasing along the cut subtracts correctly.
+const ICON_BG = '#f7f7f3'; // --color-bg, for the icons that must be opaque
+
+async function iconRgba(size) {
+  let base = await readFile(p('brand/icon.svg'), 'utf8');
+  base = base.replace(/<rect\s+x="-150"[^>]*\/>/g, '');
+
+  const solid = base.split(SRC_PLANET).join(ACCENT).split(SRC_CUT).join(ACCENT);
+  const cutOnly = base.split(SRC_PLANET).join('none').split(SRC_CUT).join(ACCENT);
+
+  const render = async (svg) => {
+    const { data, info } = await sharp(Buffer.from(svg), { density: 300 })
+      .resize(size, size, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+      .ensureAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+    return { data, info };
+  };
+
+  const a = await render(solid);
+  const c = await render(cutOnly);
+
+  const [r, g, b] = [26, 143, 214]; // ACCENT
+  const out = Buffer.alloc(a.data.length);
+  for (let i = 0; i < a.data.length; i += 4) {
+    out[i] = r; out[i + 1] = g; out[i + 2] = b;
+    out[i + 3] = Math.max(0, a.data[i + 3] - c.data[i + 3]);
   }
-  const cut = await sharp(keyed, { raw: { width: info.width, height: info.height, channels: 4 } }).png().toBuffer();
-  const trimmed = await sharp(cut).trim({ threshold: 1 }).png().toBuffer();
+  return sharp(out, { raw: { width: a.info.width, height: a.info.height, channels: 4 } });
+}
+
+// Trim to the artwork, then re-square with a small margin.
+async function squaredIcon(size) {
+  const trimmed = await (await iconRgba(1024)).trim({ threshold: 1 }).png().toBuffer();
   const t = await sharp(trimmed).metadata();
-  // Re-square with a small margin so no size lands on a cropped edge.
   const side = Math.max(t.width, t.height);
   const pad = Math.round(side * 0.06);
   const canvas = side + pad * 2;
-  return sharp({ create: { width: canvas, height: canvas, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } } })
+  // Composite and resize have to be separate passes: sharp applies resize to
+  // the base image before compositing, which would shrink the canvas below the
+  // overlay and fail.
+  const squared = await sharp({ create: { width: canvas, height: canvas, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } } })
     .composite([{ input: trimmed, left: Math.round((canvas - t.width) / 2), top: Math.round((canvas - t.height) / 2) }])
     .png()
     .toBuffer();
+  return sharp(squared).resize(size, size).png().toBuffer();
 }
 
-const mark = await markOnAlpha(p('brand/favicon.png'));
-
-const ICONS = [
+// Transparent icons — browser tabs and PWA "any" icons.
+for (const [out, size] of [
   ['public/favicon.png', 256],
-  ['public/apple-touch-icon.png', 180],
   ['public/icon-192.png', 192],
   ['public/icon-512.png', 512],
-];
-for (const [out, size] of ICONS) {
-  const png = await sharp(mark).resize(size, size).png().toBuffer();
+]) {
+  const png = await squaredIcon(size);
   await writeFile(p(out), png);
   console.log('Wrote', out, `${size}x${size}`, png.length, 'bytes');
 }
 
-// Maskable icon: Android crops this to an arbitrary shape (circle, squircle,
-// …), so it needs an opaque fill and the mark kept inside the centre ~80% safe
-// zone. The transparent icons above would let the launcher background show
-// through and lose the slash, so this one gets its own file.
-{
-  const size = 512;
-  const inner = Math.round(size * 0.6);
-  const png = await sharp({
-    create: { width: size, height: size, channels: 4, background: '#f7f7f3' },
-  })
-    .composite([{ input: await sharp(mark).resize(inner, inner).png().toBuffer(), left: Math.round((size - inner) / 2), top: Math.round((size - inner) / 2) }])
+// Opaque icons. iOS composites a transparent apple-touch-icon onto black, and
+// Android crops a maskable icon to an arbitrary shape, so both need a filled
+// background and the mark kept inside the centre safe zone.
+for (const [out, size, inset] of [
+  ['public/apple-touch-icon.png', 180, 0.78],
+  ['public/icon-maskable-512.png', 512, 0.6],
+]) {
+  const inner = Math.round(size * inset);
+  const png = await sharp({ create: { width: size, height: size, channels: 4, background: ICON_BG } })
+    .composite([{ input: await squaredIcon(inner), left: Math.round((size - inner) / 2), top: Math.round((size - inner) / 2) }])
     .png()
     .toBuffer();
-  await writeFile(p('public/icon-maskable-512.png'), png);
-  console.log('Wrote public/icon-maskable-512.png 512x512', png.length, 'bytes');
+  await writeFile(p(out), png);
+  console.log('Wrote', out, `${size}x${size}`, png.length, 'bytes');
 }
