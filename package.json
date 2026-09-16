@@ -21,13 +21,13 @@
     "@fontsource/anton": "^5.2.7",
     "@fontsource/hind-siliguri": "^5.2.7",
     "@fontsource/jetbrains-mono": "^5.2.8",
-    "@tailwindcss/vite": "^4.3.0",
     "alpinejs": "^3.15.12",
     "astro": "^6.4.4",
     "tailwindcss": "^4.3.0"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.3.0"
+    "@tailwindcss/postcss": "^4.3.0",
+    "sharp": "^0.34.5"
   },
   "overrides": {
     "vite": "^7"

@@ -12,7 +12,7 @@ link: ''
 repo: https://github.com/akashmony01/mohakash
 featured: true
 order: 0
-cover: /uploads/Screenshot from 2026-08-06 23-44-25.png
+cover: /uploads/mohakash-homepage.png
 resources:
   - label: Live site
     href: https://mohakash.xyz

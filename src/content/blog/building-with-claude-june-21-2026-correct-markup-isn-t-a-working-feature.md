@@ -5,7 +5,7 @@ category: Building with Claude
 excerpt: Today was one of those debugging sessions that humbles you — or in this case, humbles the AI I was pairing with. What started as a simple "hey, can you check how this form works?" turned into a multi-hour investigation across email plumbing, magic links, and a YouTube embed that refused to cooperate. Here's the honest account.
 draft: false
 hidden: false
-cover: /uploads/a.webp
+cover: /uploads/youtube-embed-error-153.webp
 resources: []
 ---
 

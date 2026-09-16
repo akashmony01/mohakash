@@ -5,7 +5,7 @@ category: Building with Claude
 excerpt: 'Getting a web app from "works on my laptop" to "live on the internet with HTTPS" is one of those tasks that looks like ten minutes and turns into an afternoon. Today I moved a Python web app onto a server that already hosts a dozen other sites, and I got bitten by two things that had nothing to do with each other: a shell-parsing bug in a secrets file, and a CDN error code that pointed me in exactly the wrong direction.'
 draft: false
 hidden: false
-cover: /uploads/Screenshot from 2026-08-06 23-34-22.png
+cover: /uploads/backatit-settings.png
 resources: []
 ---
 

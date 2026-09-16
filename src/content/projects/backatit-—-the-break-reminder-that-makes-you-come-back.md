@@ -14,7 +14,7 @@ repo: https://github.com/akashmony01/BackAtIt
 featured: true
 hidden: false
 order: 1
-cover: /uploads/Screenshot from 2026-08-06 23-34-22.png
+cover: /uploads/backatit-settings.png
 resources:
   - label: Download for Linux
     href: https://github.com/akashmony01/BackAtIt/releases/latest

@@ -5,7 +5,7 @@ category: Building with Claude
 excerpt: "I set out to do something that sounded simple: deploy a web app onto a server I already owned. A few hours later I'd learned that the riskiest part of deployment isn't the app at all — it's the moment you touch configuration that other things quietly depend on. This is a story about breaking a bunch of unrelated sites, recovering them, and walking away with a much better mental model for working on shared infrastructure."
 draft: false
 hidden: false
-cover: /uploads/a.png
+cover: /uploads/cloudflare-ssl-handshake-failed.png
 resources: []
 ---
 
