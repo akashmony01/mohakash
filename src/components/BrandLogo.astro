@@ -1,13 +1,22 @@
 ---
-// Animated wordmark. Plays one cycle (Mohammed Akash → moh·akash → back),
-// then rests on the full name. trigger="load" fires on page load (header);
-// trigger="view" fires when scrolled into view (footer), driven by the
-// IntersectionObserver in BaseLayout that watches `.brand-onview`.
+// Animated wordmark. Plays one cycle (Mohammed Akash → the mohakash mark →
+// back), then rests on the full name. trigger="load" fires on page load
+// (header); trigger="view" fires when scrolled into view (footer), driven by
+// the IntersectionObserver in BaseLayout that watches `.brand-onview`.
+//
+// The second panel is the logo image (brand/logo.png → public/, plus recolored
+// variants from scripts/build-brand.mjs). It's two-tone and fixed, so the file
+// has to match its backdrop: `on="accent"` for the solid-blue header, and
+// `on="surface"` for the footer, which swaps with the theme.
 interface Props {
   class?: string;
   trigger?: 'load' | 'view';
+  on?: 'accent' | 'surface';
 }
-const { class: className = '', trigger = 'load' } = Astro.props;
+const { class: className = '', trigger = 'load', on = 'accent' } = Astro.props;
+
+// Intrinsic size of the mark, so the reserved box is right before it loads.
+const MARK = { width: 500, height: 81, alt: '' } as const;
 ---
 
 <a
@@ -28,7 +37,14 @@ const { class: className = '', trigger = 'load' } = Astro.props;
         </span>
       </span>
       <span class="brand-panel">
-        <span class="text-[1.25rem] tracking-wide">moh·akash</span>
+        {on === 'accent' ? (
+          <img src="/logo.png" {...MARK} class="h-6 w-auto" loading="eager" decoding="async" />
+        ) : (
+          <Fragment>
+            <img src="/logo-on-light.png" {...MARK} class="h-6 w-auto dark:hidden" decoding="async" />
+            <img src="/logo-on-dark.png" {...MARK} class="hidden h-6 w-auto dark:block" decoding="async" />
+          </Fragment>
+        )}
       </span>
     </span>
   </span>
