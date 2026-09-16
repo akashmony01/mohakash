@@ -25,6 +25,13 @@ const LOGO_W = 296, LOGO_X = M, LOGO_Y = 74;
 const ACCENT = '#1a8fd6', TEXT = '#0e1116', MUTED = '#2c303b', BG = '#f7f7f3';
 
 const text = JSON.parse(await readFile(p('brand/og-text.json'), 'utf8'));
+// Guard against the two halves drifting: a renamed or dropped run would
+// otherwise render as `undefined` path data and silently vanish.
+const NEEDED = ['lead', 'rest', 'role', 'bio1', 'bio2', 'bio3', 'url'];
+const missing = NEEDED.filter((k) => !text[k]);
+if (missing.length) {
+  throw new Error(`brand/og-text.json is missing ${missing.join(', ')} — re-run scripts/build-og-text.py`);
+}
 
 // --- logo, nested as real vector -------------------------------------------
 const logoSrc = await readFile(p('public/logo-on-light.svg'), 'utf8');
@@ -107,9 +114,10 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.
   <rect x="${M}" y="168" width="72" height="7" fill="${ACCENT}"/>
   <path d="${text.lead}" fill="${ACCENT}"/>
   <path d="${text.rest}" fill="none" stroke="${ACCENT}" stroke-width="2.4"/>
-  <path d="${text.hook}" fill="${ACCENT}"/>
-  <path d="${text.tag1}" fill="${MUTED}"/>
-  <path d="${text.tag2}" fill="${MUTED}"/>
+  <path d="${text.role}" fill="${ACCENT}"/>
+  <path d="${text.bio1}" fill="${MUTED}"/>
+  <path d="${text.bio2}" fill="${MUTED}"/>
+  <path d="${text.bio3}" fill="${MUTED}"/>
   <path d="${text.url}" fill="${TEXT}"/>
 </svg>
 `;

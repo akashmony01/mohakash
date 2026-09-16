@@ -71,14 +71,17 @@ M = 84            # left margin, mirrored on the right
 COL = 636         # text column budget, so nothing runs under the portrait
 
 # Mirrors the homepage hero: first name solid, surname outlined.
+# Below it, the role line anchors a short bio drawn from the site's own copy
+# (src/data/home.json hero.intro and the Person schema in BaseLayout) — nothing
+# here is invented. Every line is measured to fit COL.
 runs = {
     "lead": text_path("Mohammed", "anton", 100, M, 282)[0],
     "rest": text_path("Akash", "anton", 100, M, 384)[0],
-    "hook": text_path("moh\u00b7akash \u2014 \u201cthe infinite sky\u201d", "grotesk", 27, M, 442, wght=500)[0],
-    # Two lines: as one line this runs 736px and would collide with the photo.
-    "tag1": text_path("Web developer \u00b7 researcher \u00b7 poet", "grotesk", 23, M, 486)[0],
-    "tag2": text_path("Building in public with Claude.", "grotesk", 23, M, 518)[0],
-    "url": text_path("mohakash.xyz", "grotesk", 26, M, 574, wght=600)[0],
+    "role": text_path("Web developer \u00b7 researcher \u00b7 poet", "grotesk", 24, M, 438, wght=600)[0],
+    "bio1": text_path("Freelance developer and NLP researcher in Bangladesh,", "grotesk", 21, M, 476)[0],
+    "bio2": text_path("writing poetry now and then, mostly in Bengali.", "grotesk", 21, M, 504)[0],
+    "bio3": text_path("Building in public with Claude, day by day.", "grotesk", 21, M, 532)[0],
+    "url": text_path("mohakash.xyz", "grotesk", 26, M, 578, wght=600)[0],
 }
 
 out = ROOT / "brand/og-text.json"
